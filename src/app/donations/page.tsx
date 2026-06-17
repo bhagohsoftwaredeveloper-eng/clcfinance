@@ -75,15 +75,12 @@ const AddServiceTimeForm = ({ onSave, onCancel, initialValue = '', isEdit = fals
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="service-time" className="text-right">
-            Time
-          </Label>
+        <div className="space-y-2">
+          <Label htmlFor="service-time">Time</Label>
           <Input
             id="service-time"
             value={serviceTime}
             onChange={(e) => setServiceTime(e.target.value)}
-            className="col-span-3"
             placeholder="e.g., 9:00 AM Sunday"
           />
         </div>
@@ -113,15 +110,12 @@ const AddCategoryForm = ({ onSave, onCancel, initialValue = '', isEdit = false }
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="category-name" className="text-right">
-            Name
-          </Label>
+        <div className="space-y-2">
+          <Label htmlFor="category-name">Name</Label>
           <Input
             id="category-name"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="col-span-3"
             placeholder="e.g., Special Project"
           />
         </div>
@@ -151,15 +145,12 @@ const AddGivingTypeForm = ({ onSave, onCancel, initialValue = '', isEdit = false
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="giving-type" className="text-right">
-            Type
-          </Label>
+        <div className="space-y-2">
+          <Label htmlFor="giving-type">Type</Label>
           <Input
             id="giving-type"
             value={givingType}
             onChange={(e) => setGivingType(e.target.value)}
-            className="col-span-3"
             placeholder="e.g., Digital Wallet"
           />
         </div>
@@ -207,11 +198,11 @@ const DonationForm = ({ donation, onSave, onCancel, serviceTimes, categories, gi
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="member" className="text-right">Donor</Label>
+      <div className="grid gap-5 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="donor">Donor</Label>
           <Select onValueChange={setMemberId} value={memberId}>
-            <SelectTrigger className="col-span-3">
+            <SelectTrigger id="donor">
               <SelectValue placeholder="Select a donor" />
             </SelectTrigger>
             <SelectContent>
@@ -221,100 +212,87 @@ const DonationForm = ({ donation, onSave, onCancel, serviceTimes, categories, gi
             </SelectContent>
           </Select>
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="amount" className="text-right">Amount</Label>
-          <Input id="amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="col-span-3" />
-        </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onManageCategoryClick}>Manage Categories</Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="category" className="text-right">Category</Label>
-            <Select onValueChange={(value: Donation['category']) => setCategory(value)} value={category}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(cat => (
-                   <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="space-y-2">
+          <Label htmlFor="amount">Amount</Label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">₱</span>
+            <Input id="amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="pl-7" placeholder="0.00" />
           </div>
         </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onManageGivingTypeClick}>Manage Giving Types</Button>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="category">Category</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageCategoryClick}>Manage</Button>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="giving-type" className="text-right">Giving Type</Label>
-            <Select onValueChange={setGivingTypeId} value={givingTypeId}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a giving type" />
-              </SelectTrigger>
-              <SelectContent>
-                {givingTypes.map(type => (
-                  <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-2">
-            <Label htmlFor="has-reference" className="text-right">Reference</Label>
-            <div className="col-span-3 flex items-center space-x-2">
-              <Switch
-                id="has-reference"
-                checked={hasReference}
-                onCheckedChange={(checked) => {
-                  setHasReference(checked);
-                  if (!checked) {
-                    setReference('');
-                  }
-                }}
-              />
-              <span className="text-sm text-muted-foreground">Include reference</span>
-            </div>
-          </div>
-          {hasReference && (
-            <div className="grid grid-cols-4 items-center gap-4 mt-2">
-              <Label htmlFor="reference" className="text-right">Reference</Label>
-              <Input
-                id="reference"
-                value={reference}
-                onChange={(e) => setReference(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter reference number or details"
-              />
-            </div>
-          )}
+          <Select onValueChange={(value: Donation['category']) => setCategory(value)} value={category}>
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map(cat => (
+                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onManageServiceTimeClick}>Manage Service Times</Button>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="giving-type">Giving Type</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageGivingTypeClick}>Manage</Button>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="service-time" className="text-right">Service Time</Label>
-            <Select onValueChange={setServiceTime} value={serviceTime}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a service time" />
-              </SelectTrigger>
-              <SelectContent>
-                {serviceTimes.map(time => (
-                  <SelectItem key={time.id} value={time.time}>{time.time}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <Select onValueChange={setGivingTypeId} value={givingTypeId}>
+            <SelectTrigger id="giving-type">
+              <SelectValue placeholder="Select a giving type" />
+            </SelectTrigger>
+            <SelectContent>
+              {givingTypes.map(type => (
+                <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <div className="space-y-0.5">
+            <Label htmlFor="has-reference">Reference</Label>
+            <p className="text-xs text-muted-foreground">Attach a reference number</p>
           </div>
+          <Switch
+            id="has-reference"
+            checked={hasReference}
+            onCheckedChange={(checked) => {
+              setHasReference(checked);
+              if (!checked) {
+                setReference('');
+              }
+            }}
+          />
+        </div>
+        {hasReference && (
+          <div className="space-y-2">
+            <Label htmlFor="reference">Reference details</Label>
+            <Input
+              id="reference"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              placeholder="Enter reference number or details"
+            />
+          </div>
+        )}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="service-time">Service Time</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageServiceTimeClick}>Manage</Button>
+          </div>
+          <Select onValueChange={setServiceTime} value={serviceTime}>
+            <SelectTrigger id="service-time">
+              <SelectValue placeholder="Select a service time" />
+            </SelectTrigger>
+            <SelectContent>
+              {serviceTimes.map(time => (
+                <SelectItem key={time.id} value={time.time}>{time.time}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <DialogFooter>

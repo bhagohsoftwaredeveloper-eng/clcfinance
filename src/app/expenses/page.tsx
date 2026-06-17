@@ -106,15 +106,12 @@ const ManageCategoriesForm = ({
     <div>
       <form onSubmit={handleAddSubmit} className="mb-6">
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="category-name" className="text-right">
-              New Category
-            </Label>
+          <div className="space-y-2">
+            <Label htmlFor="category-name">New Category</Label>
             <Input
               id="category-name"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
-              className="col-span-3"
               placeholder="e.g., Special Project"
             />
           </div>
@@ -209,35 +206,33 @@ const ExpenseForm = ({ expense, onSave, onCancel, categories, onAddCategoryClick
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="description" className="text-right">Description</Label>
-          <Textarea id="description" name="description" value={formData.description || ''} onChange={handleChange} className="col-span-3" />
+      <div className="grid gap-5 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea id="description" name="description" value={formData.description || ''} onChange={handleChange} placeholder="What was this expense for?" rows={3} />
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="amount" className="text-right">Amount</Label>
-          <Input id="amount" name="amount" type="number" value={formData.amount || ''} onChange={handleChange} className="col-span-3" />
+        <div className="space-y-2">
+          <Label htmlFor="amount">Amount</Label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">₱</span>
+            <Input id="amount" name="amount" type="number" value={formData.amount || ''} onChange={handleChange} className="pl-7" placeholder="0.00" />
+          </div>
         </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onAddCategoryClick}>Manage Categories</Button>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="category">Category</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onAddCategoryClick}>Manage</Button>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="category" className="text-right">Category</Label>
-            <Select onValueChange={handleSelectChange} value={formData.category}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(cat => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select onValueChange={handleSelectChange} value={formData.category}>
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map(cat => (
+                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <DialogFooter>

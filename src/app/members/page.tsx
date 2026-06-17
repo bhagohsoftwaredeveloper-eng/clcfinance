@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MoreHorizontal, PlusCircle, Trash, Edit, Search, HandCoins, ChevronDown, FileDown, Printer } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import type { Member, Donation } from '@/lib/types';
 import {
   Dialog,
@@ -48,6 +48,15 @@ import autoTable from 'jspdf-autotable';
 
 const initialNetworks: Array<{id: string, name: string}> = [];
 
+/** First letters of the first two name parts, e.g. "John Doe" -> "JD". */
+const getInitials = (name: string) =>
+  (name || '')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join('') || '?';
+
 const AddNetworkForm = ({ onSave, onCancel, initialValue = '', isEdit = false }: { onSave: (networkName: string) => void; onCancel: () => void; initialValue?: string; isEdit?: boolean; }) => {
   const [networkName, setNetworkName] = useState(initialValue);
 
@@ -67,15 +76,12 @@ const AddNetworkForm = ({ onSave, onCancel, initialValue = '', isEdit = false }:
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="network-name" className="text-right">
-            Name
-          </Label>
+        <div className="space-y-2">
+          <Label htmlFor="network-name">Name</Label>
           <Input
             id="network-name"
             value={networkName}
             onChange={(e) => setNetworkName(e.target.value)}
-            className="col-span-3"
             placeholder="e.g., Young Adults"
           />
         </div>
@@ -109,15 +115,12 @@ const AddCategoryForm = ({ onSave, onCancel, initialValue = '', isEdit = false }
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="category-name" className="text-right">
-            Name
-          </Label>
+        <div className="space-y-2">
+          <Label htmlFor="category-name">Name</Label>
           <Input
             id="category-name"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="col-span-3"
             placeholder="e.g., Special Project"
           />
         </div>
@@ -152,15 +155,12 @@ const AddServiceTimeForm = ({ onSave, onCancel, initialValue = '', isEdit = fals
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="service-time" className="text-right">
-            Time
-          </Label>
+        <div className="space-y-2">
+          <Label htmlFor="service-time">Time</Label>
           <Input
             id="service-time"
             value={serviceTime}
             onChange={(e) => setServiceTime(e.target.value)}
-            className="col-span-3"
             placeholder="e.g., 9:00 AM Sunday"
           />
         </div>
@@ -194,15 +194,12 @@ const AddGivingTypeForm = ({ onSave, onCancel, initialValue = '', isEdit = false
   return (
     <form onSubmit={handleSubmit}>
       <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="giving-type" className="text-right">
-            Type
-          </Label>
+        <div className="space-y-2">
+          <Label htmlFor="giving-type">Type</Label>
           <Input
             id="giving-type"
             value={givingType}
             onChange={(e) => setGivingType(e.target.value)}
-            className="col-span-3"
             placeholder="e.g., Digital Wallet"
           />
         </div>
@@ -259,105 +256,92 @@ const DonationForm = ({ member, onSave, onCancel, serviceTimes, categories, givi
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="member" className="text-right">Donor</Label>
-           <Input id="name" name="name" value={member.name || ''} readOnly className="col-span-3" />
+      <div className="grid gap-5 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="donor">Donor</Label>
+          <Input id="donor" name="name" value={member.name || ''} readOnly className="bg-muted/50" />
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="amount" className="text-right">Amount</Label>
-          <Input id="amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="col-span-3" />
-        </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onManageCategoryClick}>Manage Categories</Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="category" className="text-right">Category</Label>
-            <Select onValueChange={setCategoryId}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(cat => (
-                   <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <div className="space-y-2">
+          <Label htmlFor="amount">Amount</Label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">₱</span>
+            <Input id="amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="pl-7" placeholder="0.00" />
           </div>
         </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onManageGivingTypeClick}>Manage Giving Types</Button>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="category">Category</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageCategoryClick}>Manage</Button>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="giving-type" className="text-right">Giving Type</Label>
-            <Select onValueChange={setGivingTypeId}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a giving type" />
-              </SelectTrigger>
-              <SelectContent>
-                {givingTypes.map(type => (
-                  <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-2">
-            <Label htmlFor="has-reference" className="text-right">Reference</Label>
-            <div className="col-span-3 flex items-center space-x-2">
-              <Switch
-                id="has-reference"
-                checked={hasReference}
-                onCheckedChange={(checked) => {
-                  setHasReference(checked);
-                  if (!checked) {
-                    setReference('');
-                  }
-                }}
-              />
-              <span className="text-sm text-muted-foreground">Include reference</span>
-            </div>
-          </div>
-          {hasReference && (
-            <div className="grid grid-cols-4 items-center gap-4 mt-2">
-              <Label htmlFor="reference" className="text-right">Reference</Label>
-              <Input
-                id="reference"
-                value={reference}
-                onChange={(e) => setReference(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter reference number or details"
-              />
-            </div>
-          )}
+          <Select onValueChange={setCategoryId}>
+            <SelectTrigger id="category">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map(cat => (
+                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onManageServiceTimeClick}>Manage Service Times</Button>
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="giving-type">Giving Type</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageGivingTypeClick}>Manage</Button>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="service-time" className="text-right">Service Time</Label>
-            <Select onValueChange={setServiceTimeId}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a service time" />
-              </SelectTrigger>
-              <SelectContent>
-                {serviceTimes.map(time => (
-                  <SelectItem key={time.id} value={time.id}>{time.time}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <Select onValueChange={setGivingTypeId}>
+            <SelectTrigger id="giving-type">
+              <SelectValue placeholder="Select a giving type" />
+            </SelectTrigger>
+            <SelectContent>
+              {givingTypes.map(type => (
+                <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <div className="space-y-0.5">
+            <Label htmlFor="has-reference">Reference</Label>
+            <p className="text-xs text-muted-foreground">Attach a reference number</p>
           </div>
+          <Switch
+            id="has-reference"
+            checked={hasReference}
+            onCheckedChange={(checked) => {
+              setHasReference(checked);
+              if (!checked) {
+                setReference('');
+              }
+            }}
+          />
+        </div>
+        {hasReference && (
+          <div className="space-y-2">
+            <Label htmlFor="reference">Reference details</Label>
+            <Input
+              id="reference"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              placeholder="Enter reference number or details"
+            />
+          </div>
+        )}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="service-time">Service Time</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageServiceTimeClick}>Manage</Button>
+          </div>
+          <Select onValueChange={setServiceTimeId}>
+            <SelectTrigger id="service-time">
+              <SelectValue placeholder="Select a service time" />
+            </SelectTrigger>
+            <SelectContent>
+              {serviceTimes.map(time => (
+                <SelectItem key={time.id} value={time.id}>{time.time}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <DialogFooter>
@@ -390,7 +374,7 @@ const MemberForm = ({ member, onSave, onCancel, networks, onManageNetworkClick }
     const newMember: Member = {
       id: member?.id || `m${Date.now()}`,
       joinDate: member?.joinDate || new Date().toISOString().split('T')[0],
-      avatarUrl: member?.avatarUrl || `https://picsum.photos/seed/${Date.now()}/200/200`,
+      avatarUrl: member?.avatarUrl || '',
       email: formData.email || '',
       phone: formData.phone || '',
       address: formData.address || '',
@@ -401,43 +385,40 @@ const MemberForm = ({ member, onSave, onCancel, networks, onManageNetworkClick }
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">Name</Label>
-          <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} className="col-span-3" />
+      <div className="grid gap-5 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} placeholder="Full name" />
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="email" className="text-right">Email</Label>
-          <Input id="email" name="email" type="email" value={formData.email || ''} onChange={handleChange} className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="phone" className="text-right">Phone</Label>
-          <Input id="phone" name="phone" value={formData.phone || ''} onChange={handleChange} className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="address" className="text-right">Address</Label>
-          <Input id="address" name="address" value={formData.address || ''} onChange={handleChange} className="col-span-3" />
-        </div>
-        <div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <div />
-            <div className="col-span-3 text-right">
-              <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={onManageNetworkClick}>Manage Networks</Button>
-            </div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" name="email" type="email" value={formData.email || ''} onChange={handleChange} placeholder="name@email.com" />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4 mt-1">
-            <Label htmlFor="network" className="text-right">Network</Label>
-            <Select onValueChange={handleSelectChange} defaultValue={formData.network}>
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select a network" />
-              </SelectTrigger>
-              <SelectContent>
-                {networks.map(net => (
-                  <SelectItem key={net.id} value={net.name}>{net.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone</Label>
+            <Input id="phone" name="phone" value={formData.phone || ''} onChange={handleChange} placeholder="+63..." />
           </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="address">Address</Label>
+          <Input id="address" name="address" value={formData.address || ''} onChange={handleChange} placeholder="Street, city" />
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="network">Network</Label>
+            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageNetworkClick}>Manage</Button>
+          </div>
+          <Select onValueChange={handleSelectChange} defaultValue={formData.network}>
+            <SelectTrigger id="network">
+              <SelectValue placeholder="Select a network" />
+            </SelectTrigger>
+            <SelectContent>
+              {networks.map(net => (
+                <SelectItem key={net.id} value={net.name}>{net.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <DialogFooter>
@@ -1307,9 +1288,10 @@ export default function MembersPage() {
                 <TableRow key={member.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={member.avatarUrl} alt={member.name} data-ai-hint="person portrait" />
-                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                      <Avatar className="h-9 w-9">
+                        <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                          {getInitials(member.name)}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="font-medium">{member.name}</div>
                     </div>

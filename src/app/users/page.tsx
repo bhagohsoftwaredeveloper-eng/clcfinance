@@ -155,18 +155,20 @@ const UserForm = ({ user, onSave, onCancel }: { user?: User | null, onSave: (use
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">Name</Label>
-          <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} className="col-span-3" />
+      <div className="grid gap-5 py-4">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} placeholder="Full name" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input id="username" name="username" value={formData.username || ''} onChange={handleChange} placeholder="username" />
+          </div>
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="username" className="text-right">Username</Label>
-          <Input id="username" name="username" value={formData.username || ''} onChange={handleChange} className="col-span-3" />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="password" className="text-right">Password</Label>
-          <div className="col-span-3 relative">
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <div className="relative">
             <Input
               id="password"
               name="password"
@@ -186,10 +188,10 @@ const UserForm = ({ user, onSave, onCancel }: { user?: User | null, onSave: (use
             </Button>
           </div>
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="role" className="text-right">Role</Label>
+        <div className="space-y-2">
+          <Label htmlFor="role">Role</Label>
           <Select onValueChange={handleSelectChange} defaultValue={formData.role}>
-            <SelectTrigger className="col-span-3">
+            <SelectTrigger id="role">
               <SelectValue placeholder="Select a role" />
             </SelectTrigger>
             <SelectContent>
@@ -198,28 +200,30 @@ const UserForm = ({ user, onSave, onCancel }: { user?: User | null, onSave: (use
             </SelectContent>
           </Select>
         </div>
-        <div className="grid grid-cols-4 items-start gap-4">
-            <Label className="text-right pt-2">Permissions</Label>
-            <div className="col-span-3 space-y-2">
-                <div className="flex items-center gap-2">
-                    <Checkbox
-                        id="select-all-permissions"
-                        checked={allPermissionsSelected}
-                        onCheckedChange={handleSelectAllPermissions}
-                    />
-                    <Label htmlFor="select-all-permissions" className="font-medium">Select All</Label>
-                </div>
-                {availablePermissions.map(permission => (
-                    <div key={permission.id} className="flex items-center gap-2 ml-4">
-                        <Checkbox
-                            id={`perm-${permission.id}`}
-                            checked={formData.permissions?.[permission.id]}
-                            onCheckedChange={(checked) => handlePermissionChange(permission.id, checked)}
-                        />
-                        <Label htmlFor={`perm-${permission.id}`} className="font-normal">{permission.label}</Label>
-                    </div>
-                ))}
+        <div className="space-y-2">
+          <Label>Permissions</Label>
+          <div className="space-y-3 rounded-lg border p-3">
+            <div className="flex items-center gap-2 border-b pb-2">
+              <Checkbox
+                id="select-all-permissions"
+                checked={allPermissionsSelected}
+                onCheckedChange={handleSelectAllPermissions}
+              />
+              <Label htmlFor="select-all-permissions" className="font-medium">Select All</Label>
             </div>
+            <div className="grid grid-cols-2 gap-2">
+              {availablePermissions.map(permission => (
+                <div key={permission.id} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`perm-${permission.id}`}
+                    checked={formData.permissions?.[permission.id]}
+                    onCheckedChange={(checked) => handlePermissionChange(permission.id, checked)}
+                  />
+                  <Label htmlFor={`perm-${permission.id}`} className="font-normal">{permission.label}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
       <DialogFooter>

@@ -59,31 +59,33 @@ const EventForm = ({ onSave, onCancel }: { onSave: (event: Event) => void, onCan
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="title" className="text-right">Title</Label>
-          <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="col-span-3" />
+      <div className="grid gap-5 py-4">
+        <div className="space-y-2">
+          <Label htmlFor="title">Title</Label>
+          <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Event title" />
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="date" className="text-right">Date</Label>
-          <Input id="date" type="date" onChange={(e) => setDate(new Date(e.target.value))} className="col-span-3" />
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="date">Date</Label>
+            <Input id="date" type="date" onChange={(e) => setDate(new Date(e.target.value))} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="resource">Resource</Label>
+            <Select onValueChange={(value: Event['resource']) => setResource(value)}>
+              <SelectTrigger id="resource">
+                <SelectValue placeholder="Select a resource" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Main Hall">Main Hall</SelectItem>
+                <SelectItem value="Community Room">Community Room</SelectItem>
+                <SelectItem value="Chapel">Chapel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="resource" className="text-right">Resource</Label>
-          <Select onValueChange={(value: Event['resource']) => setResource(value)}>
-            <SelectTrigger className="col-span-3">
-              <SelectValue placeholder="Select a resource" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Main Hall">Main Hall</SelectItem>
-              <SelectItem value="Community Room">Community Room</SelectItem>
-              <SelectItem value="Chapel">Chapel</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid grid-cols-4 items-start gap-4">
-          <Label htmlFor="description" className="text-right pt-2">Description</Label>
-          <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="col-span-3" />
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Details about the event" rows={3} />
         </div>
       </div>
       <DialogFooter>
