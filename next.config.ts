@@ -8,8 +8,10 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: isElectron, // Disable PWA in Electron builds
-  // Enable PWA for web deployments
+  // Disable PWA in Electron builds AND in development. next-pwa is not
+  // Turbopack-compatible and the service-worker compile/caching slows down
+  // `next dev` first load. PWA stays active for production (web) builds.
+  disable: isElectron || !isProduction,
   buildExcludes: [/manifest\.json$/],
   runtimeCaching: [
     {

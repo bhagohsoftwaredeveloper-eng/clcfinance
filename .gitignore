@@ -61,3 +61,11 @@ logs/
 /dist-electron-new/
 /dist-installer/
 /dist/
+
+# next-pwa generated service worker (regenerated on every build)
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/worker-*.js
+/public/fallback-*.js

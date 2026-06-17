@@ -159,7 +159,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           </header>
           <div className="flex-1 overflow-auto">
-            <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">{children}</div>
+            {/* keyed by route so only the page content re-animates, not the sidebar */}
+            <div key={pathname} className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8 animate-page-in">
+              {children}
+            </div>
           </div>
         </main>
       </div>
