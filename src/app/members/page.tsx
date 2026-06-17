@@ -41,6 +41,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { QuickSelect, type QuickSelectOption } from '@/components/ui/quick-select';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import jsPDF from 'jspdf';
@@ -224,7 +225,7 @@ const AddGivingTypeForm = ({ onSave, onCancel, initialValue = '', isEdit = false
   );
 };
 
-const DonationForm = ({ member, onSave, onCancel, serviceTimes, categories, givingTypes, onManageServiceTimeClick, onManageCategoryClick, onManageGivingTypeClick }: { member: Member, onSave: (donation: Donation) => void, onCancel: () => void, serviceTimes: Array<{id: string, time: string}>, categories: Array<{id: string, name: string}>, givingTypes: Array<{id: string, name: string}>, onManageServiceTimeClick: () => void, onManageCategoryClick: () => void, onManageGivingTypeClick: () => void }) => {
+const DonationForm = ({ member, onSave, onCancel, serviceTimes, categories, givingTypes, onManageServiceTimeClick, onManageCategoryClick, onManageGivingTypeClick, onAddCategory, onAddGivingType, onAddServiceTime }: { member: Member, onSave: (donation: Donation) => void, onCancel: () => void, serviceTimes: Array<{id: string, time: string}>, categories: Array<{id: string, name: string}>, givingTypes: Array<{id: string, name: string}>, onManageServiceTimeClick: () => void, onManageCategoryClick: () => void, onManageGivingTypeClick: () => void, onAddCategory: (name: string) => Promise<QuickSelectOption | null>, onAddGivingType: (name: string) => Promise<QuickSelectOption | null>, onAddServiceTime: (name: string) => Promise<QuickSelectOption | null> }) => {
   const [amount, setAmount] = useState<number | string>('');
   const [categoryId, setCategoryId] = useState<string>();
   const [serviceTimeId, setServiceTimeId] = useState<string>();
@@ -269,36 +270,28 @@ const DonationForm = ({ member, onSave, onCancel, serviceTimes, categories, givi
           </div>
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="category">Category</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageCategoryClick}>Manage</Button>
-          </div>
-          <Select onValueChange={setCategoryId}>
-            <SelectTrigger id="category">
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(cat => (
-                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="category">Category</Label>
+          <QuickSelect
+            id="category"
+            value={categoryId}
+            onValueChange={setCategoryId}
+            options={categories.map(c => ({ value: c.id, label: c.name }))}
+            placeholder="Select a category"
+            addLabel="Add category"
+            onAdd={onAddCategory}
+          />
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="giving-type">Giving Type</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageGivingTypeClick}>Manage</Button>
-          </div>
-          <Select onValueChange={setGivingTypeId}>
-            <SelectTrigger id="giving-type">
-              <SelectValue placeholder="Select a giving type" />
-            </SelectTrigger>
-            <SelectContent>
-              {givingTypes.map(type => (
-                <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="giving-type">Giving Type</Label>
+          <QuickSelect
+            id="giving-type"
+            value={givingTypeId}
+            onValueChange={setGivingTypeId}
+            options={givingTypes.map(t => ({ value: t.id, label: t.name }))}
+            placeholder="Select a giving type"
+            addLabel="Add giving type"
+            onAdd={onAddGivingType}
+          />
         </div>
         <div className="flex items-center justify-between rounded-lg border p-3">
           <div className="space-y-0.5">
@@ -328,20 +321,16 @@ const DonationForm = ({ member, onSave, onCancel, serviceTimes, categories, givi
           </div>
         )}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="service-time">Service Time</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageServiceTimeClick}>Manage</Button>
-          </div>
-          <Select onValueChange={setServiceTimeId}>
-            <SelectTrigger id="service-time">
-              <SelectValue placeholder="Select a service time" />
-            </SelectTrigger>
-            <SelectContent>
-              {serviceTimes.map(time => (
-                <SelectItem key={time.id} value={time.id}>{time.time}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="service-time">Service Time</Label>
+          <QuickSelect
+            id="service-time"
+            value={serviceTimeId}
+            onValueChange={setServiceTimeId}
+            options={serviceTimes.map(t => ({ value: t.id, label: t.time }))}
+            placeholder="Select a service time"
+            addLabel="Add service time"
+            onAdd={onAddServiceTime}
+          />
         </div>
       </div>
       <DialogFooter>
@@ -353,7 +342,7 @@ const DonationForm = ({ member, onSave, onCancel, serviceTimes, categories, givi
 };
 
 
-const MemberForm = ({ member, onSave, onCancel, networks, onManageNetworkClick }: { member?: Member | null, onSave: (member: Member) => void, onCancel: () => void, networks: Array<{id: string, name: string}>, onManageNetworkClick: () => void }) => {
+const MemberForm = ({ member, onSave, onCancel, networks, onManageNetworkClick, onAddNetwork }: { member?: Member | null, onSave: (member: Member) => void, onCancel: () => void, networks: Array<{id: string, name: string}>, onManageNetworkClick: () => void, onAddNetwork: (name: string) => Promise<QuickSelectOption | null> }) => {
   const [formData, setFormData] = useState<Partial<Member>>(member || { name: '', email: '', phone: '', address: '', network: 'Main' });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -405,20 +394,16 @@ const MemberForm = ({ member, onSave, onCancel, networks, onManageNetworkClick }
           <Input id="address" name="address" value={formData.address || ''} onChange={handleChange} placeholder="Street, city" />
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="network">Network</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageNetworkClick}>Manage</Button>
-          </div>
-          <Select onValueChange={handleSelectChange} defaultValue={formData.network}>
-            <SelectTrigger id="network">
-              <SelectValue placeholder="Select a network" />
-            </SelectTrigger>
-            <SelectContent>
-              {networks.map(net => (
-                <SelectItem key={net.id} value={net.name}>{net.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="network">Network</Label>
+          <QuickSelect
+            id="network"
+            value={formData.network}
+            onValueChange={handleSelectChange}
+            options={networks.map(n => ({ value: n.name, label: n.name }))}
+            placeholder="Select a network"
+            addLabel="Add network"
+            onAdd={onAddNetwork}
+          />
         </div>
       </div>
       <DialogFooter>
@@ -566,6 +551,56 @@ export default function MembersPage() {
       console.error('Failed to fetch networks:', error);
     }
   };
+
+  // Inline quick-add helpers used by the QuickSelect dropdowns. They create the
+  // lookup item via the API, update the in-memory list, and return the new
+  // option so it can be auto-selected — no nested "Manage" dialog needed.
+  const addLookup = async (
+    url: string,
+    payload: Record<string, string>,
+    responseKey: string,
+    toOption: (created: any) => QuickSelectOption,
+    updateState: (created: any) => void
+  ): Promise<QuickSelectOption | null> => {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast({ variant: 'destructive', title: 'Could not add', description: data.error || 'Please try again.' });
+        return null;
+      }
+      const created = (await res.json())[responseKey];
+      updateState(created);
+      return toOption(created);
+    } catch {
+      toast({ variant: 'destructive', title: 'Error', description: 'A network error occurred.' });
+      return null;
+    }
+  };
+
+  const addCategory = (name: string) =>
+    addLookup('/api/donation-categories', { name }, 'category',
+      (c) => ({ value: c.id, label: c.name }),
+      (c) => setCategories((prev) => [...prev, c].sort((a, b) => a.name.localeCompare(b.name))));
+
+  const addGivingType = (name: string) =>
+    addLookup('/api/giving-types', { name }, 'givingType',
+      (g) => ({ value: g.id, label: g.name }),
+      (g) => setGivingTypes((prev) => [...prev, g].sort((a, b) => a.name.localeCompare(b.name))));
+
+  const addServiceTime = (name: string) =>
+    addLookup('/api/service-times', { time: name }, 'serviceTime',
+      (s) => ({ value: s.id, label: s.time }),
+      (s) => setServiceTimes((prev) => [...prev, s].sort((a, b) => a.time.localeCompare(b.time))));
+
+  const addNetwork = (name: string) =>
+    addLookup('/api/networks', { name }, 'network',
+      (n) => ({ value: n.name, label: n.name }),
+      (n) => setNetworks((prev) => [...prev, n].sort((a, b) => a.name.localeCompare(b.name))));
 
   const handleAddNewMember = () => {
     setEditingMember(null);
@@ -1390,6 +1425,7 @@ export default function MembersPage() {
             onCancel={() => setIsMemberDialogOpen(false)}
             networks={networks}
             onManageNetworkClick={() => setIsManageNetworksDialogOpen(true)}
+            onAddNetwork={addNetwork}
           />
         </DialogContent>
       </Dialog>
@@ -1434,6 +1470,9 @@ export default function MembersPage() {
               onManageServiceTimeClick={() => setIsManageServiceTimesDialogOpen(true)}
               onManageCategoryClick={() => setIsManageCategoriesDialogOpen(true)}
               onManageGivingTypeClick={() => setIsManageGivingTypesDialogOpen(true)}
+              onAddCategory={addCategory}
+              onAddGivingType={addGivingType}
+              onAddServiceTime={addServiceTime}
               />
           </DialogContent>
         </Dialog>

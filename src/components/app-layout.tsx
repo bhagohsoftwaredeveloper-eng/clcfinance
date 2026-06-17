@@ -13,6 +13,7 @@ import {
   CreditCard,
   Users2,
   Settings,
+  SlidersHorizontal,
   Moon,
   Sun
 } from 'lucide-react';
@@ -43,6 +44,7 @@ const navItems: { href: string; label: string; icon: React.ElementType, id: Page
   { href: '/expenses', label: 'Expenses', icon: CreditCard, id: 'expenses' },
   { href: '/reports', label: 'Reports', icon: BarChart, id: 'reports' },
   { href: '/users', label: 'User Management', icon: Users2, id: 'users' },
+  { href: '/configuration', label: 'Configuration', icon: SlidersHorizontal, id: 'settings' },
   { href: '/settings', label: 'Settings', icon: Settings, id: 'settings' },
 ];
 

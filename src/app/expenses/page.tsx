@@ -46,6 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { QuickSelect, type QuickSelectOption } from '@/components/ui/quick-select';
 import { Textarea } from '@/components/ui/textarea';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -174,7 +175,7 @@ const ManageCategoriesForm = ({
 };
 
 
-const ExpenseForm = ({ expense, onSave, onCancel, categories, onAddCategoryClick, userId }: { expense?: Expense | null, onSave: (expense: Expense) => void, onCancel: () => void, categories: string[], onAddCategoryClick: () => void, userId: string }) => {
+const ExpenseForm = ({ expense, onSave, onCancel, categories, onAddCategoryClick, userId, onAddCategory }: { expense?: Expense | null, onSave: (expense: Expense) => void, onCancel: () => void, categories: string[], onAddCategoryClick: () => void, userId: string, onAddCategory: (name: string) => Promise<QuickSelectOption | null> }) => {
   const [formData, setFormData] = useState<Partial<Expense>>(
     expense || { description: '', amount: 0, category: undefined }
   );
@@ -219,20 +220,16 @@ const ExpenseForm = ({ expense, onSave, onCancel, categories, onAddCategoryClick
           </div>
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="category">Category</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onAddCategoryClick}>Manage</Button>
-          </div>
-          <Select onValueChange={handleSelectChange} value={formData.category}>
-            <SelectTrigger id="category">
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(cat => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="category">Category</Label>
+          <QuickSelect
+            id="category"
+            value={formData.category}
+            onValueChange={(value) => handleSelectChange(value as Expense['category'])}
+            options={categories.map(c => ({ value: c, label: c }))}
+            placeholder="Select a category"
+            addLabel="Add category"
+            onAdd={onAddCategory}
+          />
         </div>
       </div>
       <DialogFooter>
@@ -303,6 +300,29 @@ export default function ExpensesPage() {
   const handleEditExpense = (expense: Expense) => {
     setEditingExpense(expense);
     setIsDialogOpen(true);
+  };
+
+  // Inline quick-add for the category QuickSelect: creates the category, adds it
+  // to the in-memory list, and returns it for auto-selection.
+  const addCategory = async (name: string): Promise<QuickSelectOption | null> => {
+    try {
+      const res = await fetch('/api/expense-categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'Failed to add category');
+        return null;
+      }
+      const { category } = await res.json();
+      setCategories((prev) => [...prev, category.name].sort((a, b) => a.localeCompare(b)));
+      return { value: category.name, label: category.name };
+    } catch {
+      alert('Error adding category');
+      return null;
+    }
   };
 
   const handleSaveExpense = async (expense: Expense) => {
@@ -802,6 +822,7 @@ export default function ExpensesPage() {
             categories={categories}
             onAddCategoryClick={() => setIsCategoryDialogOpen(true)}
             userId={authContext?.user?.id || ''}
+            onAddCategory={addCategory}
           />
         </DialogContent>
       </Dialog>

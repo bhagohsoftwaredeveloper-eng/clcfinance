@@ -47,6 +47,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { QuickSelect, type QuickSelectOption } from '@/components/ui/quick-select';
 import { Switch } from '@/components/ui/switch';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -165,7 +166,7 @@ const AddGivingTypeForm = ({ onSave, onCancel, initialValue = '', isEdit = false
   );
 };
 
-const DonationForm = ({ donation, onSave, onCancel, serviceTimes, categories, givingTypes, onManageServiceTimeClick, onManageCategoryClick, onManageGivingTypeClick, userId, members }: { donation?: Donation | null, onSave: (donation: Donation) => void, onCancel: () => void, serviceTimes: Array<{id: string, time: string}>, categories: Array<{id: string, name: string}>, givingTypes: Array<{ id: string; name: string }>, onManageServiceTimeClick: () => void, onManageCategoryClick: () => void, onManageGivingTypeClick: () => void, userId: string, members: Member[] }) => {
+const DonationForm = ({ donation, onSave, onCancel, serviceTimes, categories, givingTypes, onManageServiceTimeClick, onManageCategoryClick, onManageGivingTypeClick, userId, members, onAddCategory, onAddGivingType, onAddServiceTime }: { donation?: Donation | null, onSave: (donation: Donation) => void, onCancel: () => void, serviceTimes: Array<{id: string, time: string}>, categories: Array<{id: string, name: string}>, givingTypes: Array<{ id: string; name: string }>, onManageServiceTimeClick: () => void, onManageCategoryClick: () => void, onManageGivingTypeClick: () => void, userId: string, members: Member[], onAddCategory: (name: string) => Promise<QuickSelectOption | null>, onAddGivingType: (name: string) => Promise<QuickSelectOption | null>, onAddServiceTime: (name: string) => Promise<QuickSelectOption | null> }) => {
   const [memberId, setMemberId] = useState<string>(donation?.memberId || '');
   const [amount, setAmount] = useState<number | string>(donation?.amount || '');
   const [category, setCategory] = useState<Donation['category']>(donation?.category || 'Tithe');
@@ -220,36 +221,28 @@ const DonationForm = ({ donation, onSave, onCancel, serviceTimes, categories, gi
           </div>
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="category">Category</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageCategoryClick}>Manage</Button>
-          </div>
-          <Select onValueChange={(value: Donation['category']) => setCategory(value)} value={category}>
-            <SelectTrigger id="category">
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(cat => (
-                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="category">Category</Label>
+          <QuickSelect
+            id="category"
+            value={category}
+            onValueChange={(value) => setCategory(value as Donation['category'])}
+            options={categories.map(c => ({ value: c.name, label: c.name }))}
+            placeholder="Select a category"
+            addLabel="Add category"
+            onAdd={onAddCategory}
+          />
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="giving-type">Giving Type</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageGivingTypeClick}>Manage</Button>
-          </div>
-          <Select onValueChange={setGivingTypeId} value={givingTypeId}>
-            <SelectTrigger id="giving-type">
-              <SelectValue placeholder="Select a giving type" />
-            </SelectTrigger>
-            <SelectContent>
-              {givingTypes.map(type => (
-                <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="giving-type">Giving Type</Label>
+          <QuickSelect
+            id="giving-type"
+            value={givingTypeId}
+            onValueChange={setGivingTypeId}
+            options={givingTypes.map(t => ({ value: t.id, label: t.name }))}
+            placeholder="Select a giving type"
+            addLabel="Add giving type"
+            onAdd={onAddGivingType}
+          />
         </div>
         <div className="flex items-center justify-between rounded-lg border p-3">
           <div className="space-y-0.5">
@@ -279,20 +272,16 @@ const DonationForm = ({ donation, onSave, onCancel, serviceTimes, categories, gi
           </div>
         )}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="service-time">Service Time</Label>
-            <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={onManageServiceTimeClick}>Manage</Button>
-          </div>
-          <Select onValueChange={setServiceTime} value={serviceTime}>
-            <SelectTrigger id="service-time">
-              <SelectValue placeholder="Select a service time" />
-            </SelectTrigger>
-            <SelectContent>
-              {serviceTimes.map(time => (
-                <SelectItem key={time.id} value={time.time}>{time.time}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="service-time">Service Time</Label>
+          <QuickSelect
+            id="service-time"
+            value={serviceTime}
+            onValueChange={setServiceTime}
+            options={serviceTimes.map(t => ({ value: t.time, label: t.time }))}
+            placeholder="Select a service time"
+            addLabel="Add service time"
+            onAdd={onAddServiceTime}
+          />
         </div>
       </div>
       <DialogFooter>
@@ -460,6 +449,49 @@ export default function DonationsPage() {
       console.error('Failed to fetch giving types:', error);
     }
   };
+
+  // Inline quick-add helpers for the QuickSelect dropdowns.
+  const addLookup = async (
+    url: string,
+    payload: Record<string, string>,
+    responseKey: string,
+    toOption: (created: any) => QuickSelectOption,
+    updateState: (created: any) => void
+  ): Promise<QuickSelectOption | null> => {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast({ variant: 'destructive', title: 'Could not add', description: data.error || 'Please try again.' });
+        return null;
+      }
+      const created = (await res.json())[responseKey];
+      updateState(created);
+      return toOption(created);
+    } catch {
+      toast({ variant: 'destructive', title: 'Error', description: 'A network error occurred.' });
+      return null;
+    }
+  };
+
+  const addCategory = (name: string) =>
+    addLookup('/api/donation-categories', { name }, 'category',
+      (c) => ({ value: c.name, label: c.name }),
+      (c) => setCategories((prev) => [...prev, c].sort((a, b) => a.name.localeCompare(b.name))));
+
+  const addGivingType = (name: string) =>
+    addLookup('/api/giving-types', { name }, 'givingType',
+      (g) => ({ value: g.id, label: g.name }),
+      (g) => setGivingTypes((prev) => [...prev, g].sort((a, b) => a.name.localeCompare(b.name))));
+
+  const addServiceTime = (name: string) =>
+    addLookup('/api/service-times', { time: name }, 'serviceTime',
+      (s) => ({ value: s.time, label: s.time }),
+      (s) => setServiceTimes((prev) => [...prev, s].sort((a, b) => a.time.localeCompare(b.time))));
 
   const handleSaveDonation = async (donation: Donation) => {
     try {
@@ -1168,6 +1200,9 @@ export default function DonationsPage() {
             onManageGivingTypeClick={() => setIsManageGivingTypesDialogOpen(true)}
             userId={authContext?.user?.id || ''}
             members={members}
+            onAddCategory={addCategory}
+            onAddGivingType={addGivingType}
+            onAddServiceTime={addServiceTime}
             />
         </DialogContent>
       </Dialog>
