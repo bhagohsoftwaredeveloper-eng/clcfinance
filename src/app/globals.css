@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Modern minimal — light */
+    --background: 240 6% 97%;
+    --foreground: 240 10% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 12%;
+    --primary: 142 46% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 9% 22%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 142 40% 95%;
+    --accent-foreground: 142 46% 28%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 89%;
+    --ring: 142 46% 40%;
+    --chart-1: 142 46% 44%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 271 65% 58%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.65rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 6% 30%;
+    --sidebar-primary: 142 46% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 40% 95%;
+    --sidebar-accent-foreground: 142 46% 28%;
+    --sidebar-border: 240 6% 91%;
+    --sidebar-ring: 142 46% 40%;
+  }
+
+  .dark {
+    /* Modern minimal — true dark */
+    --background: 240 10% 7%;
+    --foreground: 0 0% 95%;
+    --card: 240 9% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 9% 10%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 142 52% 50%;
+    --primary-foreground: 240 10% 7%;
+    --secondary: 240 6% 15%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 240 6% 15%;
+    --muted-foreground: 240 5% 60%;
+    --accent: 142 30% 18%;
+    --accent-foreground: 142 52% 70%;
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 17%;
+    --input: 240 6% 19%;
+    --ring: 142 52% 50%;
+    --chart-1: 142 52% 52%;
+    --chart-2: 199 85% 56%;
+    --chart-3: 38 92% 58%;
+    --chart-4: 271 70% 68%;
+    --chart-5: 340 78% 64%;
+    --sidebar-background: 240 10% 9%;
+    --sidebar-foreground: 240 5% 65%;
+    --sidebar-primary: 142 52% 50%;
+    --sidebar-primary-foreground: 240 10% 7%;
+    --sidebar-accent: 142 30% 18%;
+    --sidebar-accent-foreground: 142 52% 70%;
+    --sidebar-border: 240 6% 16%;
+    --sidebar-ring: 142 52% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer utilities {
+  /* Refined scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Subtle card lift used across pages */
+  .surface-card {
+    @apply border bg-card shadow-sm transition-shadow duration-200;
+  }
+  .surface-card:hover {
+    @apply shadow-md;
+  }
+}
+
+@layer utilities {
+  @media print {
+    body {
+      background: #fff;
+      color: #000;
+    }
+    .print-hide {
+      display: none !important;
+    }
+    .print-show {
+      display: block !important;
+    }
+    .print-only {
+      display: block !important;
+    }
+    .app-layout-main, .app-layout-header {
+       display: none;
+    }
+     main {
+      padding: 0;
+      overflow: visible;
+    }
+    #reports-content {
+      padding: 0;
+    }
+    .card {
+      border: none;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+    }
+    .card-header {
+      display: none !important;
+    }
+    .print-checkbox {
+        display: none;
+    }
+    .page-break-before {
+      page-break-before: always;
+    }
+    /* Hide any logos, titles, or headers */
+    h1, h2, h3, h4, h5, h6 {
+      display: none !important;
+    }
+    .card-title, .card-description {
+      display: none !important;
+    }
+    /* Ensure only table data is visible */
+    table {
+      margin: 0;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    /* Hide any decorative elements */
+    .badge, .lucide {
+      display: none !important;
+    }
+  }
+
+  /* Hide print-only elements on screen */
+  .print-only {
+    display: none;
+  }
+
+  /* Electron drag region for frameless window */
+  .drag-region {
+    -webkit-app-region: drag;
+  }
+
+  .drag-region button {
+    -webkit-app-region: no-drag;
+  }
+}
