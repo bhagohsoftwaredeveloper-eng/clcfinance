@@ -31,7 +31,7 @@ export const createUser = (user: any) =>
 
 export const updateUser = (id: string, user: any) =>
   query.run(
-    'UPDATE users SET name = ?, username = ?, role = ?, password = IFNULL(?, password), permissions = ? WHERE id = ?',
+    'UPDATE users SET name = ?, username = ?, role = ?, password = COALESCE(?, password), permissions = ? WHERE id = ?',
     [user.name, user.username, user.role, user.password || null, JSON.stringify(user.permissions), id]
   );
 

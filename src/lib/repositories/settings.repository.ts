@@ -1,4 +1,4 @@
-import { query, isElectron } from '../db/connection';
+import { query } from '../db/connection';
 
 const DEFAULT_SETTINGS = {
   appName: 'CLC Finances',
@@ -16,7 +16,8 @@ export const getSettings = async () => {
     logoUrl: setting.logo_url,
     theme: setting.theme,
     backupTime: setting.backup_time,
-    backupEnabled: setting.backup_enabled === 1,
+    // Postgres returns a real boolean; tolerate 1/0 just in case.
+    backupEnabled: setting.backup_enabled === true || setting.backup_enabled === 1,
   };
 };
 
@@ -28,13 +29,18 @@ export const updateSettings = async (settings: {
   backupEnabled?: boolean;
 }) => {
   const backupTime = settings.backupTime || '02:00';
-  const backupEnabled = settings.backupEnabled !== undefined ? (settings.backupEnabled ? 1 : 0) : 1;
-  const params = ['global', settings.appName, settings.logoUrl, settings.theme, backupTime, backupEnabled];
+  const backupEnabled = settings.backupEnabled !== undefined ? settings.backupEnabled : true;
 
-  // SQLite and MySQL express "upsert" differently.
-  const sql = isElectron
-    ? 'INSERT OR REPLACE INTO settings (id, app_name, logo_url, theme, backup_time, backup_enabled, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-    : 'INSERT INTO settings (id, app_name, logo_url, theme, backup_time, backup_enabled, updated_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE app_name = VALUES(app_name), logo_url = VALUES(logo_url), theme = VALUES(theme), backup_time = VALUES(backup_time), backup_enabled = VALUES(backup_enabled), updated_at = CURRENT_TIMESTAMP';
-
-  await query.run(sql, params);
+  await query.run(
+    `INSERT INTO settings (id, app_name, logo_url, theme, backup_time, backup_enabled, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT (id) DO UPDATE SET
+       app_name = EXCLUDED.app_name,
+       logo_url = EXCLUDED.logo_url,
+       theme = EXCLUDED.theme,
+       backup_time = EXCLUDED.backup_time,
+       backup_enabled = EXCLUDED.backup_enabled,
+       updated_at = CURRENT_TIMESTAMP`,
+    ['global', settings.appName, settings.logoUrl, settings.theme, backupTime, backupEnabled]
+  );
 };
