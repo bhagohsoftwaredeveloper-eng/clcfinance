@@ -15,7 +15,8 @@ import {
   Settings,
   SlidersHorizontal,
   Moon,
-  Sun
+  Sun,
+  Menu
 } from 'lucide-react';
 
 import {
@@ -26,8 +27,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarProvider,
-  SidebarTrigger,
   SidebarFooter,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
@@ -47,6 +48,22 @@ const navItems: { href: string; label: string; icon: React.ElementType, id: Page
   { href: '/configuration', label: 'Configuration', icon: SlidersHorizontal, id: 'settings' },
   { href: '/settings', label: 'Settings', icon: Settings, id: 'settings' },
 ];
+
+/** Mobile-only hamburger that opens the sidebar sheet. */
+function HamburgerTrigger() {
+  const { toggleSidebar } = useSidebar();
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleSidebar}
+      className="size-9 rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
+    >
+      <Menu className="size-5" />
+      <span className="sr-only">Toggle menu</span>
+    </Button>
+  );
+}
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -139,7 +156,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <main className="flex flex-1 flex-col overflow-hidden">
           <header className="app-layout-header sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-background/70 px-4 backdrop-blur-xl sm:px-6">
             <div className="flex items-center gap-3">
-              <SidebarTrigger className="md:hidden" />
+              <HamburgerTrigger />
               <h2 className="text-sm font-semibold text-foreground sm:text-base">
                 {accessibleNavItems.find((i) => pathname.startsWith(i.href))?.label ?? settings.appName}
               </h2>

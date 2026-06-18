@@ -57,7 +57,7 @@ export function MembersTable({ members, searchQuery, isClient, onEdit, onDelete,
 
   return (
     <>
-      <Table>
+      <Table className="responsive-cards">
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
@@ -77,7 +77,7 @@ export function MembersTable({ members, searchQuery, isClient, onEdit, onDelete,
           )}
           {pageMembers.map((member) => (
             <TableRow key={member.id}>
-              <TableCell>
+              <TableCell data-label="Name">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-9 w-9">
                     <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
@@ -87,19 +87,21 @@ export function MembersTable({ members, searchQuery, isClient, onEdit, onDelete,
                   <div className="font-medium">{member.name}</div>
                 </div>
               </TableCell>
-              <TableCell>
-                <div>{member.email}</div>
-                <div className="text-sm text-muted-foreground">{member.phone}</div>
+              <TableCell data-label="Contact">
+                <div className="text-right sm:text-left">
+                  <div>{member.email}</div>
+                  <div className="text-sm text-muted-foreground">{member.phone}</div>
+                </div>
               </TableCell>
-              <TableCell>
+              <TableCell data-label="Network">
                 <Badge variant="secondary">{member.network}</Badge>
               </TableCell>
-              <TableCell>
+              <TableCell data-label="Join Date">
                 {isClient
                   ? new Date(member.joinDate).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' })
                   : ''}
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell data-label="Actions" className="text-right">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">

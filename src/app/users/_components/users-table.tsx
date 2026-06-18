@@ -27,7 +27,7 @@ interface UsersTableProps {
 
 export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
   return (
-    <Table>
+    <Table className="responsive-cards">
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
@@ -46,14 +46,14 @@ export function UsersTable({ users, onEdit, onDelete }: UsersTableProps) {
         )}
         {users.map((user) => (
           <TableRow key={user.id}>
-            <TableCell>
+            <TableCell data-label="Name">
               <div className="font-medium">{user.name}</div>
             </TableCell>
-            <TableCell>{user.username}</TableCell>
-            <TableCell>
+            <TableCell data-label="Username">{user.username}</TableCell>
+            <TableCell data-label="Role">
               <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>{user.role}</Badge>
             </TableCell>
-            <TableCell className="text-right">
+            <TableCell data-label="Actions" className="text-right">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="h-8 w-8 p-0">

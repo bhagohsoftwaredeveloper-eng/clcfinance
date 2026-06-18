@@ -53,7 +53,7 @@ export function ExpensesTable({ expenses, isClient, isAdmin, onEdit, onDelete }:
 
   return (
     <>
-      <Table>
+      <Table className="responsive-cards">
         <TableHeader>
           <TableRow>
             <TableHead>Description</TableHead>
@@ -73,17 +73,17 @@ export function ExpensesTable({ expenses, isClient, isAdmin, onEdit, onDelete }:
           )}
           {pageExpenses.map((expense) => (
             <TableRow key={expense.id}>
-              <TableCell className="font-medium">{expense.description}</TableCell>
-              <TableCell>₱{expense.amount.toFixed(2)}</TableCell>
-              <TableCell>
+              <TableCell data-label="Description" className="font-medium">{expense.description}</TableCell>
+              <TableCell data-label="Amount">₱{expense.amount.toFixed(2)}</TableCell>
+              <TableCell data-label="Category">
                 <Badge variant={categoryVariant[expense.category] || 'secondary'}>{expense.category}</Badge>
               </TableCell>
-              <TableCell>
+              <TableCell data-label="Date">
                 {isClient
                   ? new Date(expense.date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' })
                   : ''}
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell data-label="Actions" className="text-right">
                 {isAdmin && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

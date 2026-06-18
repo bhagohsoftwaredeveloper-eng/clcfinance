@@ -35,7 +35,7 @@ export function RecentTransactions({ donations }: { donations: Donation[] }) {
             <p className="text-xs text-muted-foreground">Recorded giving will appear here.</p>
           </div>
         ) : (
-          <Table>
+          <Table className="responsive-cards">
             <TableHeader>
               <TableRow>
                 <TableHead>Donor</TableHead>
@@ -47,12 +47,12 @@ export function RecentTransactions({ donations }: { donations: Donation[] }) {
             <TableBody>
               {recent.map((donation) => (
                 <TableRow key={donation.id}>
-                  <TableCell className="font-medium">{donation.donorName}</TableCell>
-                  <TableCell>₱{donation.amount.toFixed(2)}</TableCell>
-                  <TableCell>
+                  <TableCell data-label="Donor" className="font-medium">{donation.donorName}</TableCell>
+                  <TableCell data-label="Amount">₱{donation.amount.toFixed(2)}</TableCell>
+                  <TableCell data-label="Category">
                     <Badge variant={categoryVariant[donation.category] || 'default'}>{donation.category}</Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell data-label="Date">
                     {new Date(donation.date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' })}
                   </TableCell>
                 </TableRow>

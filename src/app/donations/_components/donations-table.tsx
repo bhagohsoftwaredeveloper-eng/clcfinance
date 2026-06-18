@@ -54,7 +54,7 @@ export function DonationsTable({ donations, givingTypes, isClient, isAdmin, onEd
 
   return (
     <>
-      <Table>
+      <Table className="responsive-cards">
         <TableHeader>
           <TableRow>
             <TableHead>Donor</TableHead>
@@ -77,20 +77,20 @@ export function DonationsTable({ donations, givingTypes, isClient, isAdmin, onEd
           )}
           {pageDonations.map((donation) => (
             <TableRow key={donation.id}>
-              <TableCell className="font-medium">{donation.donorName}</TableCell>
-              <TableCell>₱{donation.amount.toFixed(2)}</TableCell>
-              <TableCell>
+              <TableCell data-label="Donor" className="font-medium">{donation.donorName}</TableCell>
+              <TableCell data-label="Amount">₱{donation.amount.toFixed(2)}</TableCell>
+              <TableCell data-label="Category">
                 <Badge variant={categoryVariant[donation.category] || 'default'}>{donation.category}</Badge>
               </TableCell>
-              <TableCell>{givingTypes.find((gt) => gt.id === donation.givingTypeId)?.name || '-'}</TableCell>
-              <TableCell>{donation.reference || '-'}</TableCell>
-              <TableCell>{donation.serviceTime}</TableCell>
-              <TableCell>
+              <TableCell data-label="Giving Type">{givingTypes.find((gt) => gt.id === donation.givingTypeId)?.name || '-'}</TableCell>
+              <TableCell data-label="Reference">{donation.reference || '-'}</TableCell>
+              <TableCell data-label="Service Time">{donation.serviceTime}</TableCell>
+              <TableCell data-label="Date">
                 {isClient
                   ? new Date(donation.date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' })
                   : ''}
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell data-label="Actions" className="text-right">
                 {isAdmin && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
