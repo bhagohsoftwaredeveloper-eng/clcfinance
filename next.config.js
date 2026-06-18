@@ -1,4 +1,6 @@
-import type {NextConfig} from 'next';
+// Plain JS config (not .ts) so `next start` never needs to install TypeScript at
+// runtime to load the config — that runtime install made the Railway container
+// slow/unstable on boot.
 
 const isElectron = process.env.ELECTRON === 'true';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -27,8 +29,8 @@ const withPWA = require('next-pwa')({
   ],
 });
 
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -37,29 +39,13 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
+      { protocol: 'https', hostname: 'placehold.co', port: '', pathname: '/**' },
+      { protocol: 'https', hostname: 'images.unsplash.com', port: '', pathname: '/**' },
+      { protocol: 'https', hostname: 'picsum.photos', port: '', pathname: '/**' },
     ],
     unoptimized: true, // Always use unoptimized images
   },
   // Electron production-specific configuration - only apply in production builds
-  // Electron uses server mode in development, static files in production
   ...(isElectronProduction && {
     trailingSlash: true,
     distDir: 'out',
@@ -72,4 +58,4 @@ const nextConfig: NextConfig = {
   }),
 };
 
-export default withPWA(nextConfig);
+module.exports = withPWA(nextConfig);
