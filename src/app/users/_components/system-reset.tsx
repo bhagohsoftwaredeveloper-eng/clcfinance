@@ -56,8 +56,9 @@ export function SystemReset({ onReset, onResetComplete }: SystemResetProps) {
           <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-4">
             <h4 className="mb-2 font-semibold text-destructive">System Reset</h4>
             <p className="mb-4 text-sm text-muted-foreground">
-              This will permanently delete all member records, events, donations, and expenses from the system.
-              User accounts and system settings will be preserved. This action cannot be undone.
+              This will permanently delete all member records, events, donations, expenses, and the
+              configuration lists (networks, categories, giving types, service times). User accounts and
+              app settings will be preserved. This action cannot be undone.
             </p>
             <div className="flex items-center gap-2">
               <Button variant="destructive" onClick={() => setOpen(true)} disabled={resetting}>
@@ -90,8 +91,9 @@ export function SystemReset({ onReset, onResetComplete }: SystemResetProps) {
                 <li>• All events</li>
                 <li>• All donations</li>
                 <li>• All expenses</li>
+                <li>• All configuration lists (networks, categories, giving types, service times)</li>
               </ul>
-              <p className="mt-2 text-sm text-muted-foreground">User accounts and system settings will be preserved.</p>
+              <p className="mt-2 text-sm text-muted-foreground">User accounts and app settings will be preserved.</p>
             </div>
             <p className="text-xs text-muted-foreground">
               <strong>Tip:</strong> Make sure you have a recent backup before proceeding — this is irreversible.
