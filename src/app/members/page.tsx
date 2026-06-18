@@ -23,12 +23,14 @@ import { MembersTable } from './_components/members-table';
 import { MemberFormDialog } from './_components/member-form';
 import { DonationFormDialog } from './_components/donation-form';
 import { printMembers, exportMembersCSV, exportMembersPDF } from './_lib/member-export';
+import { useConfirm } from '@/components/confirm-dialog';
 
 export default function MembersPage() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
   const { members, loading, saveMember, deleteMember, saveDonation } = useMembers();
   const lookups = useMemberLookups();
+  const confirm = useConfirm();
 
   const [isClient, setIsClient] = useState(false);
   const [searchInput, setSearchInput] = useState('');
@@ -62,6 +64,17 @@ export default function MembersPage() {
       setIsDonationDialogOpen(false);
       setDonatingMember(null);
     }
+  };
+
+  const handleDeleteMember = async (id: string) => {
+    const member = members.find((m) => m.id === id);
+    const ok = await confirm({
+      title: 'Delete member?',
+      description: `${member?.name ?? 'This member'} will be permanently removed. This cannot be undone.`,
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (ok) deleteMember(id);
   };
 
   if (authContext?.user && !authContext.user.permissions?.members) {
@@ -168,7 +181,7 @@ export default function MembersPage() {
             searchQuery={searchQuery}
             isClient={isClient}
             onEdit={(member) => { setEditingMember(member); setIsMemberDialogOpen(true); }}
-            onDelete={deleteMember}
+            onDelete={handleDeleteMember}
             onAddDonation={(member) => { setDonatingMember(member); setIsDonationDialogOpen(true); }}
           />
         </CardContent>

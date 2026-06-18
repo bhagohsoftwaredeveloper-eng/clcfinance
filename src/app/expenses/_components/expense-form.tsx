@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { QuickSelect, type QuickSelectOption } from '@/components/ui/quick-select';
+import { useToast } from '@/hooks/use-toast';
 import type { Expense } from '@/lib/types';
 
 interface ExpenseFormDialogProps {
@@ -67,6 +68,7 @@ function ExpenseForm({
   onSave: (expense: Expense) => void;
   onCancel: () => void;
 }) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<Partial<Expense>>(
     expense || { description: '', amount: 0, category: undefined }
   );
@@ -79,7 +81,7 @@ function ExpenseForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.description || !formData.amount || !formData.category) {
-      alert('Please fill all fields');
+      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please fill in the description, amount, and category.' });
       return;
     }
     const newExpense: Expense = {

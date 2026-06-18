@@ -1,12 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 /** Owns backup status info and the manual-backup trigger. */
 export function useBackup() {
   const [backupInfo, setBackupInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [triggering, setTriggering] = useState(false);
+  const { toast } = useToast();
 
   const loadBackupInfo = useCallback(async () => {
     setLoading(true);
@@ -32,15 +34,15 @@ export function useBackup() {
     try {
       const res = await fetch('/api/backup', { method: 'POST' });
       if (res.ok) {
-        alert('Backup completed successfully!');
+        toast({ title: 'Backup complete', description: 'The database backup finished successfully.' });
         await loadBackupInfo();
       } else {
         const error = await res.json().catch(() => ({}));
-        alert(error.message || 'Backup failed');
+        toast({ variant: 'destructive', title: 'Backup failed', description: error.message || 'Please try again.' });
       }
     } catch (error) {
       console.error('Manual backup error:', error);
-      alert('Backup failed');
+      toast({ variant: 'destructive', title: 'Backup failed', description: 'A network or server error occurred.' });
     } finally {
       setTriggering(false);
     }

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { useConfirm } from '@/components/confirm-dialog';
 
 interface LookupManagerProps {
   /** Lookup API base, e.g. "/api/networks". Must support GET/POST/PUT/DELETE. */
@@ -28,6 +29,7 @@ export function LookupManager({ apiUrl, field, itemNoun }: LookupManagerProps) {
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState('');
   const { toast } = useToast();
+  const confirm = useConfirm();
 
   const load = React.useCallback(async () => {
     try {
@@ -87,7 +89,13 @@ export function LookupManager({ apiUrl, field, itemNoun }: LookupManagerProps) {
   };
 
   const remove = async (id: string, label: string) => {
-    if (!confirm(`Delete "${label}"? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: `Delete ${itemNoun}?`,
+      description: `“${label}” will be permanently removed. This cannot be undone.`,
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (!ok) return;
     const res = await fetch(`${apiUrl}?id=${id}`, { method: 'DELETE' });
     if (res.ok) {
       await load();

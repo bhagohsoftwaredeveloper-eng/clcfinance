@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/auth-context';
 import { SettingsProvider } from '@/context/settings-context';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ConfirmProvider } from '@/components/confirm-dialog';
 
 // Use system fonts for static export compatibility
 
@@ -43,7 +44,9 @@ export default function RootLayout({
         <SettingsProvider>
           <ThemeProvider>
             <AuthProvider>
-              {children}
+              <ConfirmProvider>
+                {children}
+              </ConfirmProvider>
             </AuthProvider>
           </ThemeProvider>
         </SettingsProvider>

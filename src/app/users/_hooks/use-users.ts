@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import type { User } from '@/lib/types';
 
 /**
@@ -10,6 +11,8 @@ import type { User } from '@/lib/types';
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { toast } = useToast();
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -37,11 +40,11 @@ export function useUsers() {
         await fetchUsers();
         return true;
       }
-      alert('Failed to save user');
+      toast({ variant: 'destructive', title: 'Could not save user', description: 'Please try again.' });
       return false;
     } catch (error) {
       console.error('Error saving user:', error);
-      alert('Error saving user');
+      toast({ variant: 'destructive', title: 'Error saving user', description: 'A network or server error occurred.' });
       return false;
     }
   };
@@ -52,18 +55,18 @@ export function useUsers() {
       if (res.ok) {
         await fetchUsers();
       } else {
-        alert('Failed to delete user');
+        toast({ variant: 'destructive', title: 'Could not delete user', description: 'Please try again.' });
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Error deleting user');
+      toast({ variant: 'destructive', title: 'Error deleting user', description: 'A network or server error occurred.' });
     }
   };
 
   /** Wipe member/event/donation/expense data (admin only). Returns success. */
   const resetSystem = async (admin: { id: string; name: string; role: string }): Promise<boolean> => {
     if (admin.role !== 'Admin') {
-      alert('Only administrators can reset the system');
+      toast({ variant: 'destructive', title: 'Not allowed', description: 'Only administrators can reset the system.' });
       return false;
     }
     try {
@@ -78,15 +81,15 @@ export function useUsers() {
       });
       if (res.ok) {
         const data = await res.json();
-        alert(`System reset completed successfully!\n\nReset performed by: ${admin.name}\nTimestamp: ${new Date(data.timestamp).toLocaleString()}`);
+        toast({ title: 'System reset complete', description: `Performed by ${admin.name} · ${new Date(data.timestamp).toLocaleString()}` });
         return true;
       }
       const error = await res.json().catch(() => ({}));
-      alert(`System reset failed: ${error.error || 'Unknown error'}`);
+      toast({ variant: 'destructive', title: 'System reset failed', description: error.error || 'Unknown error.' });
       return false;
     } catch (error) {
       console.error('Error resetting system:', error);
-      alert('An error occurred while resetting the system. Please try again.');
+      toast({ variant: 'destructive', title: 'System reset failed', description: 'An error occurred. Please try again.' });
       return false;
     }
   };

@@ -15,11 +15,24 @@ import { useUsers } from './_hooks/use-users';
 import { UsersTable } from './_components/users-table';
 import { UserFormDialog } from './_components/user-form';
 import { SystemReset } from './_components/system-reset';
+import { useConfirm } from '@/components/confirm-dialog';
 
 export default function UsersPage() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
   const { users, loading, saveUser, deleteUser, resetSystem } = useUsers();
+  const confirm = useConfirm();
+
+  const handleDeleteUser = async (id: string) => {
+    const user = users.find((u) => u.id === id);
+    const ok = await confirm({
+      title: 'Delete user?',
+      description: `${user?.name ?? 'This user'} (${user?.username ?? ''}) will lose access permanently. This cannot be undone.`,
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (ok) deleteUser(id);
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
@@ -114,7 +127,7 @@ export default function UsersPage() {
             <UsersTable
               users={filteredUsers}
               onEdit={(user) => { setEditingUser(user); setIsUserDialogOpen(true); }}
-              onDelete={deleteUser}
+              onDelete={handleDeleteUser}
             />
           </CardContent>
         </Card>

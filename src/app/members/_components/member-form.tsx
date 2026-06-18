@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { QuickSelect, type QuickSelectOption } from '@/components/ui/quick-select';
+import { useToast } from '@/hooks/use-toast';
 import type { Member } from '@/lib/types';
 
 interface MemberFormDialogProps {
@@ -63,6 +64,7 @@ function MemberForm({
   onSave: (member: Member) => void;
   onCancel: () => void;
 }) {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<Partial<Member>>(
     member || { name: '', email: '', phone: '', address: '', network: 'Main' }
   );
@@ -75,7 +77,7 @@ function MemberForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.network) {
-      alert('Please fill in the name and network fields.');
+      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please fill in the name and network.' });
       return;
     }
     const newMember: Member = {

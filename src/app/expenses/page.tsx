@@ -23,12 +23,25 @@ import { useExpenseCategories } from './_hooks/use-expense-categories';
 import { ExpensesTable } from './_components/expenses-table';
 import { ExpenseFormDialog } from './_components/expense-form';
 import { printExpenses, exportExpensesCSV, exportExpensesPDF } from './_lib/expense-export';
+import { useConfirm } from '@/components/confirm-dialog';
 
 export default function ExpensesPage() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
   const { expenses, loading, saveExpense, deleteExpense } = useExpenses();
   const { categories, addCategory } = useExpenseCategories();
+  const confirm = useConfirm();
+
+  const handleDeleteExpense = async (id: string) => {
+    const expense = expenses.find((e) => e.id === id);
+    const ok = await confirm({
+      title: 'Delete expense?',
+      description: `${expense ? `“${expense.description}”` : 'This expense'} will be permanently removed. This cannot be undone.`,
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (ok) deleteExpense(id);
+  };
 
   const [isClient, setIsClient] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -199,7 +212,7 @@ export default function ExpensesPage() {
             isClient={isClient}
             isAdmin={authContext?.user?.role === 'Admin'}
             onEdit={(expense) => { setEditingExpense(expense); setIsDialogOpen(true); }}
-            onDelete={deleteExpense}
+            onDelete={handleDeleteExpense}
           />
         </CardContent>
       </Card>

@@ -22,12 +22,25 @@ import { useDonationLookups } from './_hooks/use-donation-lookups';
 import { DonationsTable } from './_components/donations-table';
 import { DonationFormDialog } from './_components/donation-form';
 import { printDonations, exportDonationsCSV, exportDonationsPDF } from './_lib/donation-export';
+import { useConfirm } from '@/components/confirm-dialog';
 
 export default function DonationsPage() {
   const router = useRouter();
   const authContext = useContext(AuthContext);
   const { donations, members, loading, saveDonation, deleteDonation } = useDonations();
   const lookups = useDonationLookups();
+  const confirm = useConfirm();
+
+  const handleDeleteDonation = async (id: string) => {
+    const donation = donations.find((d) => d.id === id);
+    const ok = await confirm({
+      title: 'Delete giving record?',
+      description: `${donation ? `₱${donation.amount.toFixed(2)} from ${donation.donorName}` : 'This record'} will be permanently removed. This cannot be undone.`,
+      confirmText: 'Delete',
+      destructive: true,
+    });
+    if (ok) deleteDonation(id);
+  };
 
   const [isClient, setIsClient] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -158,7 +171,7 @@ export default function DonationsPage() {
             isClient={isClient}
             isAdmin={authContext?.user?.role === 'Admin'}
             onEdit={(donation) => { setEditingDonation(donation); setIsDialogOpen(true); }}
-            onDelete={deleteDonation}
+            onDelete={handleDeleteDonation}
           />
         </CardContent>
       </Card>

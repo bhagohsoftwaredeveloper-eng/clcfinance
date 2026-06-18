@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSettings } from '@/context/settings-context';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Owns the editable application settings (name, logo, theme, backup schedule),
@@ -9,6 +10,7 @@ import { useSettings } from '@/context/settings-context';
  */
 export function useSettingsForm() {
   const { settings, updateSettings } = useSettings();
+  const { toast } = useToast();
   const [appName, setAppName] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [backupTime, setBackupTime] = useState('02:00');
@@ -53,14 +55,14 @@ export function useSettingsForm() {
       });
       if (res.ok) {
         updateSettings({ appName, logoUrl, theme: settings.theme });
-        alert('Settings saved successfully!');
+        toast({ title: 'Settings saved', description: 'Your changes have been applied.' });
       } else {
         const error = await res.json().catch(() => ({}));
-        alert(error.error || 'Failed to save settings');
+        toast({ variant: 'destructive', title: 'Could not save settings', description: error.error || 'Please try again.' });
       }
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Failed to save settings');
+      toast({ variant: 'destructive', title: 'Could not save settings', description: 'A network or server error occurred.' });
     } finally {
       setSaving(false);
     }
@@ -78,12 +80,13 @@ export function useSettingsForm() {
       if (res.ok) {
         setLogoUrl(result.url);
         updateSettings({ logoUrl: result.url });
+        toast({ title: 'Logo uploaded', description: 'Your new logo has been set.' });
       } else {
-        alert(result.error || 'Upload failed');
+        toast({ variant: 'destructive', title: 'Upload failed', description: result.error || 'Please try again.' });
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed');
+      toast({ variant: 'destructive', title: 'Upload failed', description: 'A network or server error occurred.' });
     } finally {
       setUploading(false);
     }

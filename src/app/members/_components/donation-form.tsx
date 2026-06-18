@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { QuickSelect, type QuickSelectOption } from '@/components/ui/quick-select';
+import { useToast } from '@/hooks/use-toast';
 import type { Member, Donation } from '@/lib/types';
 
 interface DonationFormDialogProps {
@@ -90,6 +91,7 @@ function DonationForm({
   onSave: (donation: Donation) => void;
   onCancel: () => void;
 }) {
+  const { toast } = useToast();
   const [amount, setAmount] = useState<number | string>('');
   const [categoryId, setCategoryId] = useState<string>();
   const [serviceTimeId, setServiceTimeId] = useState<string>();
@@ -100,7 +102,7 @@ function DonationForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!member || !amount || !categoryId) {
-      alert('Please fill all fields');
+      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please enter an amount and select a category.' });
       return;
     }
     const selectedCategory = categories.find((c) => c.id === categoryId);

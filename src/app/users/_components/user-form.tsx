@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import type { User, PagePermission } from '@/lib/types';
 
 const availablePermissions: { id: PagePermission; label: string }[] = [
@@ -64,6 +65,7 @@ export function UserFormDialog({ open, onOpenChange, user, onSave }: UserFormDia
 }
 
 function UserForm({ user, onSave, onCancel }: { user: User | null; onSave: (user: User) => void; onCancel: () => void }) {
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<Omit<User, 'id'> & { password: string }>(
     user
@@ -107,11 +109,11 @@ function UserForm({ user, onSave, onCancel }: { user: User | null; onSave: (user
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.username || !formData.role) {
-      alert('Please fill all required fields.');
+      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please fill in the name, username, and role.' });
       return;
     }
     if (!user && !formData.password) {
-      alert('Password is required for new users.');
+      toast({ variant: 'destructive', title: 'Password required', description: 'A password is required for new users.' });
       return;
     }
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { expenseCategories as initialExpenseCategories } from '@/lib/placeholder-data';
+import { useToast } from '@/hooks/use-toast';
 import type { QuickSelectOption } from '@/components/ui/quick-select';
 
 /**
@@ -10,6 +11,7 @@ import type { QuickSelectOption } from '@/components/ui/quick-select';
  */
 export function useExpenseCategories() {
   const [categories, setCategories] = useState<string[]>(initialExpenseCategories);
+  const { toast } = useToast();
 
   const addCategory = async (name: string): Promise<QuickSelectOption | null> => {
     try {
@@ -20,14 +22,14 @@ export function useExpenseCategories() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        alert(data.error || 'Failed to add category');
+        toast({ variant: 'destructive', title: 'Could not add category', description: data.error || 'Please try again.' });
         return null;
       }
       const { category } = await res.json();
       setCategories((prev) => [...prev, category.name].sort((a, b) => a.localeCompare(b)));
       return { value: category.name, label: category.name };
     } catch {
-      alert('Error adding category');
+      toast({ variant: 'destructive', title: 'Error adding category', description: 'A network error occurred.' });
       return null;
     }
   };

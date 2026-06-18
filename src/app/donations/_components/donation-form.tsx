@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { QuickSelect, type QuickSelectOption } from '@/components/ui/quick-select';
+import { useToast } from '@/hooks/use-toast';
 import type { Donation, Member } from '@/lib/types';
 
 interface DonationFormDialogProps {
@@ -75,12 +76,13 @@ function DonationForm({
   const [serviceTime, setServiceTime] = useState(donation?.serviceTime || '');
   const [hasReference, setHasReference] = useState(!!donation?.reference);
   const [reference, setReference] = useState(donation?.reference || '');
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const donor = members.find((m) => m.id === memberId);
     if (!donor || !amount || !category) {
-      alert('Please fill all fields');
+      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please select a donor, amount, and category.' });
       return;
     }
     const donationData: Donation = {

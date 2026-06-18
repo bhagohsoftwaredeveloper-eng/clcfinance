@@ -1,16 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import type { Expense } from '@/lib/types';
 
 /**
  * Owns the expenses list and its create/update/delete operations. Save/delete
- * surface errors via alert (matching this module's existing style) and return a
- * success boolean so the page can close the drawer.
+ * surface errors via toast and return a success boolean so the page can close
+ * the drawer.
  */
 export function useExpenses() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const fetchExpenses = useCallback(async () => {
     try {
@@ -39,11 +41,11 @@ export function useExpenses() {
         return true;
       }
       const data = await res.json().catch(() => ({}));
-      alert(data.error || 'Failed to save expense');
+      toast({ variant: 'destructive', title: 'Could not save expense', description: data.error || 'Please try again.' });
       return false;
     } catch (error) {
       console.error('Error saving expense:', error);
-      alert('Error saving expense');
+      toast({ variant: 'destructive', title: 'Error saving expense', description: 'A network or server error occurred.' });
       return false;
     }
   };
@@ -54,11 +56,11 @@ export function useExpenses() {
       if (res.ok) {
         await fetchExpenses();
       } else {
-        alert('Failed to delete expense');
+        toast({ variant: 'destructive', title: 'Could not delete expense', description: 'Please try again.' });
       }
     } catch (error) {
       console.error('Error deleting expense:', error);
-      alert('Error deleting expense');
+      toast({ variant: 'destructive', title: 'Error deleting expense', description: 'A network or server error occurred.' });
     }
   };
 
