@@ -118,7 +118,7 @@ export default function LoginPage() {
         </div>
 
         <p className="relative z-10 text-sm text-white/60">
-          Church Life &amp; Community Finances Management
+          Christian Life Center Finances Management
         </p>
       </div>
 
