@@ -89,27 +89,9 @@ export default function EventsPage() {
 
   return (
     <AppLayout>
-      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <Card className="surface-card">
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <CardTitle className="text-xl">Upcoming Events</CardTitle>
-                  <CardDescription>View and manage all scheduled events.</CardDescription>
-                </div>
-                <Button onClick={() => setIsDialogOpen(true)}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Schedule Event
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <UpcomingEvents events={upcomingEvents} />
-            </CardContent>
-          </Card>
-        </div>
-        <div>
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-3">
+        {/* Calendar — shown first on mobile for quick date reference */}
+        <div className="order-first lg:order-last">
           <Card>
             <CardContent className="p-0">
               <Calendar
@@ -122,6 +104,27 @@ export default function EventsPage() {
                   day_today: 'bg-accent text-accent-foreground',
                 }}
               />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Upcoming events list */}
+        <div className="lg:col-span-2 lg:row-start-1">
+          <Card className="surface-card">
+            <CardHeader>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="text-xl">Upcoming Events</CardTitle>
+                  <CardDescription>View and manage all scheduled events.</CardDescription>
+                </div>
+                <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Schedule Event
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <UpcomingEvents events={upcomingEvents} />
             </CardContent>
           </Card>
         </div>

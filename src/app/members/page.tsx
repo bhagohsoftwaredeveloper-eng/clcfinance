@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PlusCircle, Search, ChevronDown, FileDown, Printer } from 'lucide-react';
+import { PlusCircle, Search, ChevronDown, FileDown, Printer, Download } from 'lucide-react';
 import type { Member, Donation } from '@/lib/types';
 
 import { useMembers } from './_hooks/use-members';
@@ -132,12 +132,13 @@ export default function MembersPage() {
               <CardTitle className="text-xl">Members</CardTitle>
               <CardDescription>Manage church members and their information.</CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    Export
-                    <ChevronDown className="ml-2 h-4 w-4" />
+                    <Download className="h-4 w-4 sm:mr-2 sm:hidden" />
+                    <span className="hidden sm:inline">Export</span>
+                    <ChevronDown className="ml-1 h-4 w-4 hidden sm:inline" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -156,8 +157,8 @@ export default function MembersPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button onClick={() => { setEditingMember(null); setIsMemberDialogOpen(true); }}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                New Member
+                <PlusCircle className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">New Member</span>
               </Button>
             </div>
           </div>

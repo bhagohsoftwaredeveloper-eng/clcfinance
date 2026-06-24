@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PlusCircle, Search, ChevronDown, FileDown, Printer } from 'lucide-react';
+import { PlusCircle, Search, ChevronDown, FileDown, Printer, Download } from 'lucide-react';
 import type { Expense } from '@/lib/types';
 
 import { useExpenses } from './_hooks/use-expenses';
@@ -138,12 +138,13 @@ export default function ExpensesPage() {
               <CardTitle className="text-xl">Expenses</CardTitle>
               <CardDescription>Track all financial expenditures.</CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    Export
-                    <ChevronDown className="ml-2 h-4 w-4" />
+                    <Download className="h-4 w-4 sm:hidden" />
+                    <span className="hidden sm:inline">Export</span>
+                    <ChevronDown className="ml-1 h-4 w-4 hidden sm:inline" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -162,13 +163,13 @@ export default function ExpensesPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button onClick={() => { setEditingExpense(null); setIsDialogOpen(true); }}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Record Expense
+                <PlusCircle className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Record Expense</span>
               </Button>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div className="mt-4 flex flex-col gap-3">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -179,10 +180,13 @@ export default function ExpensesPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-2">
-              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-auto" />
-              <span className="text-muted-foreground">to</span>
-              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-auto" />
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+              <label className="text-xs font-medium text-muted-foreground sm:hidden">Date Range</label>
+              <div className="flex items-center gap-2">
+                <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="flex-1 sm:w-auto sm:flex-none" />
+                <span className="shrink-0 text-sm text-muted-foreground">to</span>
+                <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="flex-1 sm:w-auto sm:flex-none" />
+              </div>
             </div>
           </div>
 

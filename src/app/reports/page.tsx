@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, XAxis, YAxis, Legend } from 'recharts';
-import { TrendingUp, Users, Landmark, Printer, ChevronDown, FileDown } from 'lucide-react';
+import { TrendingUp, Users, Landmark, Printer, ChevronDown, FileDown, Download, Database } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,12 +72,13 @@ export default function ReportsPage() {
                   <CardTitle className="text-xl">Reports &amp; Backup</CardTitle>
                   <CardDescription>View reports and create database backups.</CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline">
-                        Export Reports
-                        <ChevronDown className="ml-2 h-4 w-4" />
+                        <Download className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Export Reports</span>
+                        <ChevronDown className="ml-1 h-4 w-4 hidden sm:inline" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -98,8 +99,9 @@ export default function ReportsPage() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="default">
-                        Database Backup
-                        <ChevronDown className="ml-2 h-4 w-4" />
+                        <Database className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Database Backup</span>
+                        <ChevronDown className="ml-1 h-4 w-4 hidden sm:inline" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -115,37 +117,44 @@ export default function ReportsPage() {
                   </DropdownMenu>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Input type="date" value={r.startDate} onChange={(e) => r.setStartDate(e.target.value)} className="w-auto" />
-                  <span className="text-muted-foreground">to</span>
-                  <Input type="date" value={r.endDate} onChange={(e) => r.setEndDate(e.target.value)} className="w-auto" />
+              <div className="flex flex-col gap-3">
+                {/* Date range */}
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                  <label className="text-xs font-medium text-muted-foreground sm:hidden">Date Range</label>
+                  <div className="flex items-center gap-2">
+                    <Input type="date" value={r.startDate} onChange={(e) => r.setStartDate(e.target.value)} className="flex-1 sm:w-auto sm:flex-none" />
+                    <span className="shrink-0 text-sm text-muted-foreground">to</span>
+                    <Input type="date" value={r.endDate} onChange={(e) => r.setEndDate(e.target.value)} className="flex-1 sm:w-auto sm:flex-none" />
+                  </div>
                 </div>
-                <Select onValueChange={(value) => r.setSelectedService(value || 'all')} defaultValue="all">
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by service" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Services</SelectItem>
-                    {r.serviceTimes.map((time: string) => (
-                      <SelectItem key={time} value={time}>{time}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select onValueChange={(value) => r.setSelectedNetwork(value || 'all')} defaultValue="all">
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by network" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Networks</SelectItem>
-                    {r.networks.map((network) => (
-                      <SelectItem key={network} value={network}>{network}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="printAll" checked={r.isPrintAllChecked} onCheckedChange={(checked) => r.setAllPrintFlags(Boolean(checked))} />
-                  <Label htmlFor="printAll">Select All for Printing</Label>
+                {/* Selects + print toggle */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select onValueChange={(value) => r.setSelectedService(value || 'all')} defaultValue="all">
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder="Filter by service" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Services</SelectItem>
+                      {r.serviceTimes.map((time: string) => (
+                        <SelectItem key={time} value={time}>{time}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select onValueChange={(value) => r.setSelectedNetwork(value || 'all')} defaultValue="all">
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder="Filter by network" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Networks</SelectItem>
+                      {r.networks.map((network) => (
+                        <SelectItem key={network} value={network}>{network}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="printAll" checked={r.isPrintAllChecked} onCheckedChange={(checked) => r.setAllPrintFlags(Boolean(checked))} />
+                    <Label htmlFor="printAll" className="text-sm">Select All for Printing</Label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,35 +162,38 @@ export default function ReportsPage() {
         </Card>
 
         {/* Summary cards */}
-        <div className="print-hide grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="print-hide grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Card>
-            <CardHeader>
-              <CardTitle>Total Members</CardTitle>
-              <CardDescription>Current active members</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center gap-4">
-              <Users className="h-12 w-12 text-muted-foreground" />
-              <div className="text-4xl font-bold">{r.totalMembers}</div>
+            <CardContent className="flex items-center gap-4 p-4 sm:p-6">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-chart-2/10 text-chart-2">
+                <Users className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Members</p>
+                <p className="text-3xl font-bold">{r.totalMembers}</p>
+              </div>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader>
-              <CardTitle>Total Giving</CardTitle>
-              <CardDescription>Total donations in period</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center gap-4">
-              <Landmark className="h-12 w-12 text-muted-foreground" />
-              <div className="text-4xl font-bold">₱{r.totalDonations.toLocaleString()}</div>
+            <CardContent className="flex items-center gap-4 p-4 sm:p-6">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Landmark className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Giving</p>
+                <p className="text-2xl font-bold">₱{r.totalDonations.toLocaleString()}</p>
+              </div>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader>
-              <CardTitle>Total Expenses</CardTitle>
-              <CardDescription>Total expenses in period</CardDescription>
-            </CardHeader>
-            <CardContent className="flex items-center gap-4">
-              <TrendingUp className="h-12 w-12 text-muted-foreground" />
-              <div className="text-4xl font-bold">₱{r.totalExpenses.toLocaleString()}</div>
+            <CardContent className="flex items-center gap-4 p-4 sm:p-6">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-chart-3/10 text-chart-3">
+                <TrendingUp className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Expenses</p>
+                <p className="text-2xl font-bold">₱{r.totalExpenses.toLocaleString()}</p>
+              </div>
             </CardContent>
           </Card>
         </div>

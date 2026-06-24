@@ -31,17 +31,17 @@ export function StatCards({ members, donations, events }: StatCardsProps) {
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       {stats.map((stat) => (
         <Card key={stat.label} className="surface-card">
-          <CardContent className="flex items-start justify-between gap-4 p-5">
+          <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
             <div className="flex flex-col gap-1">
-              <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-              <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.hint}</p>
+              <p className="text-xs font-medium text-muted-foreground sm:text-sm">{stat.label}</p>
+              <p className="text-xl font-bold tracking-tight sm:text-2xl">{stat.value}</p>
+              <p className="hidden text-xs text-muted-foreground sm:block">{stat.hint}</p>
             </div>
-            <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${stat.tint}`}>
-              <stat.icon className="size-5" />
+            <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl sm:size-11 ${stat.tint}`}>
+              <stat.icon className="size-4 sm:size-5" />
             </div>
           </CardContent>
         </Card>

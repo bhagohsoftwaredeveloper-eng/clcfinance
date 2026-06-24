@@ -171,6 +171,67 @@
     }
   }
 
+  /* ─── Mobile bottom navigation bar ─────────────────────────────────────── */
+  .mobile-bottom-nav {
+    /* Base height + extra padding for iOS home-bar / Android gesture bar */
+    height: calc(4rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Page content scrolls above the bottom nav on small screens */
+  .mobile-scroll-area {
+    padding-bottom: 0;
+  }
+  @media (max-width: 767px) {
+    .mobile-scroll-area {
+      padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
+  /* ─── Mobile UX quality-of-life ─────────────────────────────────────────
+     Prevent double-tap zoom and accidental zoom on input focus (iOS).    */
+  @media (max-width: 767px) {
+    /* Prevent browser zoom when tapping inputs — iOS requires ≥ 16 px */
+    input,
+    select,
+    textarea {
+      font-size: max(1rem, 16px) !important;
+    }
+
+    /* Remove the grey tap flash on interactive elements */
+    a,
+    button,
+    [role='button'] {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Smooth momentum scrolling inside the page area */
+    .mobile-scroll-area {
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Hide scrollbars on mobile — they look odd on small screens */
+    .mobile-scroll-area::-webkit-scrollbar {
+      display: none;
+    }
+    .mobile-scroll-area {
+      scrollbar-width: none;
+    }
+
+    /* Ensure cards/tables don't overflow the viewport horizontally */
+    .card,
+    .surface-card {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* Tighten dialog / sheet padding on small screens */
+    [data-radix-dialog-content],
+    [data-radix-sheet-content] {
+      padding: 1rem !important;
+    }
+  }
+
   /* Respect users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .animate-page-in,

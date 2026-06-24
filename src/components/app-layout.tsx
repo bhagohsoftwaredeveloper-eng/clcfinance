@@ -16,7 +16,7 @@ import {
   SlidersHorizontal,
   Moon,
   Sun,
-  Menu
+  Menu,
 } from 'lucide-react';
 
 import {
@@ -32,36 +32,74 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
-import { TitleBar } from '@/components/title-bar';
 import { AuthContext } from '@/context/auth-context';
 import { useSettings } from '@/context/settings-context';
+import { cn } from '@/lib/utils';
 import type { PagePermission } from '@/lib/types';
 
-const navItems: { href: string; label: string; icon: React.ElementType, id: PagePermission }[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, id: 'dashboard' },
-  { href: '/members', label: 'Members', icon: Users, id: 'members' },
-  { href: '/events', label: 'Events', icon: Calendar, id: 'events' },
-  { href: '/donations', label: 'Giving', icon: HandCoins, id: 'donations' },
-  { href: '/expenses', label: 'Expenses', icon: CreditCard, id: 'expenses' },
-  { href: '/reports', label: 'Reports', icon: BarChart, id: 'reports' },
-  { href: '/users', label: 'User Management', icon: Users2, id: 'users' },
-  { href: '/configuration', label: 'Configuration', icon: SlidersHorizontal, id: 'settings' },
-  { href: '/settings', label: 'Settings', icon: Settings, id: 'settings' },
+type NavItem = {
+  href: string;
+  label: string;
+  mobileLabel: string;
+  icon: React.ElementType;
+  id: PagePermission;
+};
+
+const navItems: NavItem[] = [
+  { href: '/dashboard', label: 'Dashboard',        mobileLabel: 'Home',     icon: LayoutDashboard, id: 'dashboard' },
+  { href: '/members',   label: 'Members',           mobileLabel: 'Members',  icon: Users,           id: 'members'   },
+  { href: '/events',    label: 'Events',             mobileLabel: 'Events',   icon: Calendar,        id: 'events'    },
+  { href: '/donations', label: 'Giving',             mobileLabel: 'Giving',   icon: HandCoins,       id: 'donations' },
+  { href: '/expenses',  label: 'Expenses',           mobileLabel: 'Expenses', icon: CreditCard,      id: 'expenses'  },
+  { href: '/reports',   label: 'Reports',            mobileLabel: 'Reports',  icon: BarChart,        id: 'reports'   },
+  { href: '/users',     label: 'User Management',    mobileLabel: 'Users',    icon: Users2,          id: 'users'     },
+  { href: '/configuration', label: 'Configuration', mobileLabel: 'Config',   icon: SlidersHorizontal, id: 'settings' },
+  { href: '/settings',  label: 'Settings',           mobileLabel: 'Settings', icon: Settings,        id: 'settings'  },
 ];
 
-/** Mobile-only hamburger that opens the sidebar sheet. */
-function HamburgerTrigger() {
+// Bottom nav — shows up to 4 primary shortcuts + a "More" button that opens the sidebar sheet.
+function MobileBottomNav({
+  navItems: items,
+  pathname,
+}: {
+  navItems: NavItem[];
+  pathname: string;
+}) {
   const { toggleSidebar } = useSidebar();
+  const primaryItems = items.slice(0, 4);
+  const hasMore = items.length > 4;
+
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={toggleSidebar}
-      className="size-9 rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
-    >
-      <Menu className="size-5" />
-      <span className="sr-only">Toggle menu</span>
-    </Button>
+    <nav className="mobile-bottom-nav fixed bottom-0 left-0 right-0 z-50 flex items-stretch border-t bg-background/95 backdrop-blur-xl md:hidden">
+      {primaryItems.map((item) => {
+        const isActive = pathname.startsWith(item.href);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              'flex flex-1 flex-col items-center justify-center gap-1 py-2 transition-colors',
+              isActive ? 'text-primary' : 'text-muted-foreground',
+            )}
+          >
+            {isActive && (
+              <span className="absolute top-0 h-0.5 w-8 rounded-full bg-primary" />
+            )}
+            <item.icon className="size-5 shrink-0" />
+            <span className="text-[10px] font-medium leading-none">{item.mobileLabel}</span>
+          </Link>
+        );
+      })}
+      {hasMore && (
+        <button
+          onClick={toggleSidebar}
+          className="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-muted-foreground transition-colors"
+        >
+          <Menu className="size-5 shrink-0" />
+          <span className="text-[10px] font-medium leading-none">More</span>
+        </button>
+      )}
+    </nav>
   );
 }
 
@@ -72,10 +110,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const { settings, updateSettings } = useSettings();
 
   if (!authContext) {
-    // This can happen if the component is rendered outside of the AuthProvider
-    // You might want to redirect to login or show an error.
-    // For now, we can prevent rendering the layout.
-     if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       router.push('/login');
     }
     return null;
@@ -89,21 +124,21 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   const handleThemeToggle = () => {
-    updateSettings({
-      theme: settings.theme === 'dark' ? 'light' : 'dark',
-    });
+    updateSettings({ theme: settings.theme === 'dark' ? 'light' : 'dark' });
   };
 
   const accessibleNavItems = navItems.filter(item => user?.permissions?.[item.id]);
+  const currentPage = accessibleNavItems.find((i) => pathname.startsWith(i.href));
 
   return (
-    <>
-      <SidebarProvider>
-        <div className="flex h-screen w-full">
+    <SidebarProvider>
+      <div className="flex h-screen w-full">
+        {/* ── Desktop / mobile-sheet sidebar ── */}
         <Sidebar className="app-layout-main border-r">
           <SidebarHeader className="border-b border-sidebar-border/60 px-4 py-4">
             <Logo />
           </SidebarHeader>
+
           <SidebarContent className="px-2 py-3">
             <p className="px-3 pb-2 text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground/70">
               Menu
@@ -129,6 +164,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               })}
             </SidebarMenu>
           </SidebarContent>
+
           <SidebarFooter className="border-t border-sidebar-border/60 p-2">
             <div className="flex items-center gap-3 rounded-lg px-2 py-2">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
@@ -142,7 +178,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  tooltip={{ children: "Logout", side: 'right', align: 'center' }}
+                  tooltip={{ children: 'Logout', side: 'right', align: 'center' }}
                   onClick={handleLogout}
                   className="h-10 rounded-lg text-muted-foreground hover:text-destructive"
                 >
@@ -153,15 +189,32 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
+
+        {/* ── Main content area ── */}
         <main className="flex flex-1 flex-col overflow-hidden">
-          <header className="app-layout-header sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-background/70 px-4 backdrop-blur-xl sm:px-6">
-            <div className="flex items-center gap-3">
-              <HamburgerTrigger />
-              <h2 className="text-sm font-semibold text-foreground sm:text-base">
-                {accessibleNavItems.find((i) => pathname.startsWith(i.href))?.label ?? settings.appName}
-              </h2>
+          {/* Mobile-optimised top header */}
+          <header className="app-layout-header sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-background/80 px-4 backdrop-blur-xl sm:h-16 sm:px-6">
+            {/* Left: logo pill on mobile, page title on desktop */}
+            <div className="flex min-w-0 items-center gap-2">
+              <span className="block md:hidden">
+                <Logo compact />
+              </span>
+              <div className="hidden flex-col md:flex">
+                <h2 className="truncate text-sm font-semibold text-foreground sm:text-base">
+                  {currentPage?.label ?? settings.appName}
+                </h2>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+
+            {/* Centre: breadcrumb page title on mobile */}
+            <div className="flex min-w-0 flex-1 items-center justify-center md:hidden">
+              <span className="truncate text-sm font-semibold text-foreground">
+                {currentPage?.label ?? settings.appName}
+              </span>
+            </div>
+
+            {/* Right: theme toggle */}
+            <div className="flex shrink-0 items-center gap-1">
               <Button
                 variant="ghost"
                 size="icon"
@@ -177,15 +230,21 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </Button>
             </div>
           </header>
-          <div className="flex-1 overflow-auto">
-            {/* keyed by route so only the page content re-animates, not the sidebar */}
-            <div key={pathname} className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8 animate-page-in">
+
+          {/* Scrollable page body — leaves room for bottom nav on mobile */}
+          <div className="mobile-scroll-area flex-1 overflow-auto">
+            <div
+              key={pathname}
+              className="mx-auto w-full max-w-7xl animate-page-in p-3 sm:p-6 lg:p-8"
+            >
               {children}
             </div>
           </div>
         </main>
       </div>
+
+      {/* Mobile bottom navigation (hidden on md+) */}
+      <MobileBottomNav navItems={accessibleNavItems} pathname={pathname} />
     </SidebarProvider>
-    </>
   );
 }

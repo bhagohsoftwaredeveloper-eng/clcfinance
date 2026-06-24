@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/auth-context';
@@ -8,6 +8,14 @@ import { ConfirmProvider } from '@/components/confirm-dialog';
 
 // Use system fonts for static export compatibility
 
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  minimumScale: 1,
+  viewportFit: 'cover',          // enables env(safe-area-inset-*) on iOS
+  themeColor: '#101014',
+};
 
 export const metadata: Metadata = {
   title: 'CLC Finances',

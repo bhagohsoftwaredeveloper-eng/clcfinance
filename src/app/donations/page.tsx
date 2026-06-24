@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PlusCircle, Search, ChevronDown, FileDown, Printer } from 'lucide-react';
+import { PlusCircle, Search, ChevronDown, FileDown, Printer, Download } from 'lucide-react';
 import type { Donation } from '@/lib/types';
 
 import { useDonations } from './_hooks/use-donations';
@@ -124,12 +124,13 @@ export default function DonationsPage() {
               <CardTitle className="text-xl">Giving</CardTitle>
               <CardDescription>Track all financial contributions.</CardDescription>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                    Export
-                    <ChevronDown className="ml-2 h-4 w-4" />
+                    <Download className="h-4 w-4 sm:hidden" />
+                    <span className="hidden sm:inline">Export</span>
+                    <ChevronDown className="ml-1 h-4 w-4 hidden sm:inline" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -148,8 +149,8 @@ export default function DonationsPage() {
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button onClick={() => { setEditingDonation(null); setIsDialogOpen(true); }}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Record Giving
+                <PlusCircle className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Record Giving</span>
               </Button>
             </div>
           </div>

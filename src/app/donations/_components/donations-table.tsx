@@ -125,23 +125,20 @@ export function DonationsTable({ donations, givingTypes, isClient, isAdmin, onEd
       </div>
 
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between border-t px-6 py-4">
-          <div className="text-sm text-muted-foreground">
-            Showing {startIndex + 1} to {Math.min(endIndex, donations.length)} of {donations.length} donations
-          </div>
-          <div className="flex items-center space-x-2">
+        <div className="mt-4 flex flex-col gap-2 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
+          <p className="text-center text-xs text-muted-foreground sm:text-left sm:text-sm">
+            Showing {startIndex + 1}–{Math.min(endIndex, donations.length)} of {donations.length} donations
+          </p>
+          <div className="flex items-center justify-center gap-1">
             <Button variant="outline" size="sm" onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1}>
               Previous
             </Button>
-            <div className="flex items-center space-x-1">
+            <span className="mx-2 text-sm text-muted-foreground sm:hidden">
+              {currentPage} / {totalPages}
+            </span>
+            <div className="hidden items-center gap-1 sm:flex">
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((pageNum) => (
-                <Button
-                  key={pageNum}
-                  variant={currentPage === pageNum ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setCurrentPage(pageNum)}
-                  className="h-8 w-8 p-0"
-                >
+                <Button key={pageNum} variant={currentPage === pageNum ? 'default' : 'outline'} size="sm" onClick={() => setCurrentPage(pageNum)} className="h-8 w-8 p-0">
                   {pageNum}
                 </Button>
               ))}
