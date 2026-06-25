@@ -89,6 +89,7 @@
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",
+        "baseline-browser-mapping": "^2.10.38",
         "concurrently": "^8.2.2",
         "cross-env": "^10.1.0",
         "electron": "^32.0.0",
