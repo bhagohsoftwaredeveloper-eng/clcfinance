@@ -66,7 +66,7 @@ function MemberForm({
 }) {
   const { toast } = useToast();
   const [formData, setFormData] = useState<Partial<Member>>(
-    member || { name: '', email: '', phone: '', address: '', network: 'Main' }
+    member || { name: '', email: '', phone: '', address: '', network: '' }
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +96,7 @@ function MemberForm({
     <form onSubmit={handleSubmit}>
       <div className="grid gap-5 py-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">Name <span className="text-destructive">*</span></Label>
           <Input id="name" name="name" value={formData.name || ''} onChange={handleChange} placeholder="Full name" />
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -114,7 +114,7 @@ function MemberForm({
           <Input id="address" name="address" value={formData.address || ''} onChange={handleChange} placeholder="Street, city" />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="network">Network</Label>
+          <Label htmlFor="network">Network <span className="text-destructive">*</span></Label>
           <QuickSelect
             id="network"
             value={formData.network}
