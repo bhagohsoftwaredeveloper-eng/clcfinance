@@ -3,6 +3,17 @@ import { getAllMembers, createMember, updateMember, deleteMember } from '@/lib/d
 import type { RawMember } from '@/lib/types';
 import { validateMember } from '@/lib/validation';
 
+// Postgres raises code 23505 (unique_violation); the members_email_key
+// constraint is on the email column.
+function isDuplicateEmailError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { code?: string }).code === '23505' &&
+    (error as { constraint?: string }).constraint === 'members_email_key'
+  );
+}
+
 export async function GET() {
   try {
     const members = (await getAllMembers()) as RawMember[];
@@ -46,6 +57,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, member: memberToCreate });
   } catch (error) {
+    if (isDuplicateEmailError(error)) {
+      return NextResponse.json(
+        { error: 'A member with this email already exists.' },
+        { status: 409 }
+      );
+    }
     console.error('Error creating member:', error);
     return NextResponse.json(
       { error: 'Failed to create member' },
@@ -81,6 +98,12 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true, member });
   } catch (error) {
+    if (isDuplicateEmailError(error)) {
+      return NextResponse.json(
+        { error: 'A member with this email already exists.' },
+        { status: 409 }
+      );
+    }
     console.error('Error updating member:', error);
     return NextResponse.json(
       { error: 'Failed to update member' },

@@ -6,13 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Landmark } from 'lucide-react';
 import type { Donation } from '@/lib/types';
 
-const categoryVariant: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
-  Tithe: 'default',
-  Offering: 'secondary',
-  'Building Fund': 'outline',
-  Missions: 'destructive',
-};
-
 /** Table of the five most recent donations. */
 export function RecentTransactions({ donations }: { donations: Donation[] }) {
   const recent = [...donations]
@@ -40,7 +33,7 @@ export function RecentTransactions({ donations }: { donations: Donation[] }) {
               <TableRow>
                 <TableHead>Donor</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead>Network</TableHead>
                 <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
@@ -49,8 +42,8 @@ export function RecentTransactions({ donations }: { donations: Donation[] }) {
                 <TableRow key={donation.id}>
                   <TableCell data-label="Donor" className="font-medium">{donation.donorName}</TableCell>
                   <TableCell data-label="Amount">₱{donation.amount.toFixed(2)}</TableCell>
-                  <TableCell data-label="Category">
-                    <Badge variant={categoryVariant[donation.category] || 'default'}>{donation.category}</Badge>
+                  <TableCell data-label="Network">
+                    <Badge variant="default">{donation.category}</Badge>
                   </TableCell>
                   <TableCell data-label="Date">
                     {new Date(donation.date).toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' })}

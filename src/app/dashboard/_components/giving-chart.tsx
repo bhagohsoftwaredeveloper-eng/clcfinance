@@ -7,10 +7,11 @@ import type { Donation } from '@/lib/types';
 
 const config = { amount: { label: 'Amount', color: 'hsl(var(--chart-1))' } };
 
-/** Bar chart of the current month's giving grouped by category. */
+/** Bar chart of the current month's giving grouped by network. */
 export function GivingChart({ donations }: { donations: Donation[] }) {
   const now = new Date();
-  const byCategory = donations
+  // The network name is stored in the donation's `category` field (see the giving drawer).
+  const byNetwork = donations
     .filter((d) => {
       const date = new Date(d.date);
       return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
@@ -20,19 +21,19 @@ export function GivingChart({ donations }: { donations: Donation[] }) {
       return acc;
     }, {} as Record<string, number>);
 
-  const data = Object.entries(byCategory).map(([category, amount]) => ({ category, amount }));
+  const data = Object.entries(byNetwork).map(([network, amount]) => ({ network, amount }));
 
   return (
     <Card className="surface-card">
       <CardHeader>
-        <CardTitle className="text-base">Monthly Giving by Category</CardTitle>
+        <CardTitle className="text-base">Monthly Giving by Network</CardTitle>
         <CardDescription>Giving breakdown for the current month</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={config}>
           <BarChart data={data}>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="category" tickLine={false} tickMargin={10} axisLine={false} />
+            <XAxis dataKey="network" tickLine={false} tickMargin={10} axisLine={false} />
             <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => `₱${value.toLocaleString()}`} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
             <Bar dataKey="amount" fill="var(--color-amount)" radius={4} />

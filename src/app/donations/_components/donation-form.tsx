@@ -24,11 +24,11 @@ interface DonationFormDialogProps {
   /** The donation being edited, or null when recording a new one. */
   donation: Donation | null;
   members: Member[];
-  categories: Array<{ id: string; name: string }>;
+  networks: Array<{ id: string; name: string }>;
   givingTypes: Array<{ id: string; name: string }>;
   serviceTimes: Array<{ id: string; time: string }>;
   userId: string;
-  onAddCategory: (name: string) => Promise<QuickSelectOption | null>;
+  onAddNetwork: (name: string) => Promise<QuickSelectOption | null>;
   onAddGivingType: (name: string) => Promise<QuickSelectOption | null>;
   onAddServiceTime: (name: string) => Promise<QuickSelectOption | null>;
   onSave: (donation: Donation) => void;
@@ -59,11 +59,11 @@ export function DonationFormDialog({ open, onOpenChange, donation, ...rest }: Do
 function DonationForm({
   donation,
   members,
-  categories,
+  networks,
   givingTypes,
   serviceTimes,
   userId,
-  onAddCategory,
+  onAddNetwork,
   onAddGivingType,
   onAddServiceTime,
   onSave,
@@ -71,7 +71,8 @@ function DonationForm({
 }: Omit<DonationFormDialogProps, 'open' | 'onOpenChange'> & { onCancel: () => void }) {
   const [memberId, setMemberId] = useState(donation?.memberId || '');
   const [amount, setAmount] = useState<number | string>(donation?.amount || '');
-  const [category, setCategory] = useState<Donation['category']>(donation?.category || 'Tithe');
+  // Network name is stored in the donation's `category` field (see use-donation-lookups).
+  const [category, setCategory] = useState<Donation['category']>(donation?.category || '');
   const [givingTypeId, setGivingTypeId] = useState(donation?.givingTypeId || '');
   const [serviceTime, setServiceTime] = useState(donation?.serviceTime || '');
   const [hasReference, setHasReference] = useState(!!donation?.reference);
@@ -82,7 +83,7 @@ function DonationForm({
     e.preventDefault();
     const donor = members.find((m) => m.id === memberId);
     if (!donor || !amount || !category) {
-      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please select a donor, amount, and category.' });
+      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please select a donor, amount, and network.' });
       return;
     }
     const donationData: Donation = {
@@ -124,15 +125,15 @@ function DonationForm({
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="network">Network</Label>
           <QuickSelect
-            id="category"
+            id="network"
             value={category}
             onValueChange={(value) => setCategory(value as Donation['category'])}
-            options={categories.map((c) => ({ value: c.name, label: c.name }))}
-            placeholder="Select a category"
-            addLabel="Add category"
-            onAdd={onAddCategory}
+            options={networks.map((n) => ({ value: n.name, label: n.name }))}
+            placeholder="Select a network"
+            addLabel="Add network"
+            onAdd={onAddNetwork}
           />
         </div>
         <div className="space-y-2">

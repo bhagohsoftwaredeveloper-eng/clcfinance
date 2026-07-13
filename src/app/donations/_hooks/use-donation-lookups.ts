@@ -14,6 +14,7 @@ type TimeLookup = { id: string; time: string };
  */
 export function useDonationLookups() {
   const [categories, setCategories] = useState<NamedLookup[]>([]);
+  const [networks, setNetworks] = useState<NamedLookup[]>([]);
   const [givingTypes, setGivingTypes] = useState<NamedLookup[]>([]);
   const [serviceTimes, setServiceTimes] = useState<TimeLookup[]>([]);
   const { toast } = useToast();
@@ -28,6 +29,7 @@ export function useDonationLookups() {
       }
     };
     get('/api/donation-categories', setCategories);
+    get('/api/networks', setNetworks);
     get('/api/giving-types', setGivingTypes);
     get('/api/service-times', setServiceTimes);
   }, []);
@@ -64,6 +66,11 @@ export function useDonationLookups() {
       (c) => ({ value: c.name, label: c.name }),
       (c) => setCategories((prev) => [...prev, c].sort((a, b) => a.name.localeCompare(b.name))));
 
+  const addNetwork = (name: string) =>
+    addLookup('/api/networks', { name }, 'network',
+      (n) => ({ value: n.name, label: n.name }),
+      (n) => setNetworks((prev) => [...prev, n].sort((a, b) => a.name.localeCompare(b.name))));
+
   const addGivingType = (name: string) =>
     addLookup('/api/giving-types', { name }, 'givingType',
       (g) => ({ value: g.id, label: g.name }),
@@ -74,5 +81,5 @@ export function useDonationLookups() {
       (s) => ({ value: s.time, label: s.time }),
       (s) => setServiceTimes((prev) => [...prev, s].sort((a, b) => a.time.localeCompare(b.time))));
 
-  return { categories, givingTypes, serviceTimes, addCategory, addGivingType, addServiceTime };
+  return { categories, networks, givingTypes, serviceTimes, addCategory, addNetwork, addGivingType, addServiceTime };
 }

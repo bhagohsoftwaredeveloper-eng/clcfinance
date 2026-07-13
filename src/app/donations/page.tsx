@@ -182,11 +182,11 @@ export default function DonationsPage() {
         onOpenChange={closeDialog}
         donation={editingDonation}
         members={members}
-        categories={lookups.categories}
+        networks={lookups.networks}
         givingTypes={lookups.givingTypes}
         serviceTimes={lookups.serviceTimes}
         userId={authContext?.user?.id || ''}
-        onAddCategory={lookups.addCategory}
+        onAddNetwork={lookups.addNetwork}
         onAddGivingType={lookups.addGivingType}
         onAddServiceTime={lookups.addServiceTime}
         onSave={handleSaveDonation}
