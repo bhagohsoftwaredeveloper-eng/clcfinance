@@ -82,8 +82,8 @@ function DonationForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const donor = members.find((m) => m.id === memberId);
-    if (!donor || !amount || !category) {
-      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please select a donor, amount, and network.' });
+    if (!donor || !amount || !category || !givingTypeId || !serviceTime) {
+      toast({ variant: 'destructive', title: 'Missing fields', description: 'Please fill in the donor, amount, network, giving type, and service time.' });
       return;
     }
     const donationData: Donation = {
@@ -105,7 +105,7 @@ function DonationForm({
     <form onSubmit={handleSubmit}>
       <div className="grid gap-5 py-4">
         <div className="space-y-2">
-          <Label htmlFor="donor">Donor</Label>
+          <Label htmlFor="donor">Donor <span className="text-destructive">*</span></Label>
           <Select onValueChange={setMemberId} value={memberId}>
             <SelectTrigger id="donor">
               <SelectValue placeholder="Select a donor" />
@@ -118,14 +118,14 @@ function DonationForm({
           </Select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount</Label>
+          <Label htmlFor="amount">Amount <span className="text-destructive">*</span></Label>
           <div className="relative">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">₱</span>
             <Input id="amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="pl-7" placeholder="0.00" />
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="network">Network</Label>
+          <Label htmlFor="network">Network <span className="text-destructive">*</span></Label>
           <QuickSelect
             id="network"
             value={category}
@@ -137,7 +137,7 @@ function DonationForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="giving-type">Giving Type</Label>
+          <Label htmlFor="giving-type">Giving Type <span className="text-destructive">*</span></Label>
           <QuickSelect
             id="giving-type"
             value={givingTypeId}
@@ -169,7 +169,7 @@ function DonationForm({
           </div>
         )}
         <div className="space-y-2">
-          <Label htmlFor="service-time">Service Time</Label>
+          <Label htmlFor="service-time">Service Time <span className="text-destructive">*</span></Label>
           <QuickSelect
             id="service-time"
             value={serviceTime}
