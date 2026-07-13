@@ -55,7 +55,7 @@ export function printDonations(donations: Donation[]) {
         <div class="header">Giving</div>
         <table>
           <thead>
-            <tr><th>Donor</th><th class="amount">Amount</th><th>Category</th><th>Service Time</th><th class="date">Date</th></tr>
+            <tr><th>Donor</th><th class="amount">Amount</th><th>Network</th><th>Service Time</th><th class="date">Date</th></tr>
           </thead>
           <tbody>${rows}</tbody>
           <tfoot>
@@ -81,7 +81,7 @@ export function printDonations(donations: Donation[]) {
 
 /** Download the giving list as a CSV file (with a total row). */
 export function exportDonationsCSV(donations: Donation[]) {
-  const headers = ['Donor', 'Amount', 'Category', 'Service Time', 'Date'];
+  const headers = ['Donor', 'Amount', 'Network', 'Service Time', 'Date'];
   const rows = donations.map((d) => [
     `"${d.donorName.replace(/"/g, '""')}"`,
     `PHP ${d.amount.toFixed(2)}`,
@@ -105,7 +105,7 @@ export function exportDonationsCSV(donations: Donation[]) {
 /** Download the giving list as a PDF file (with a total row). */
 export function exportDonationsPDF(donations: Donation[]) {
   const doc = new jsPDF();
-  const head = [['Donor', 'Amount', 'Category', 'Service Time', 'Date']];
+  const head = [['Donor', 'Amount', 'Network', 'Service Time', 'Date']];
   const body: (string | number)[][] = donations.map((d) => [
     d.donorName,
     `PHP ${d.amount.toFixed(2)}`,

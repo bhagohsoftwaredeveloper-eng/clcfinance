@@ -20,13 +20,6 @@ import {
 import { MoreHorizontal, Trash, Edit } from 'lucide-react';
 import type { Donation } from '@/lib/types';
 
-const categoryVariant: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
-  Tithe: 'default',
-  Offering: 'secondary',
-  'Building Fund': 'outline',
-  Missions: 'destructive',
-};
-
 const PAGE_SIZE = 10;
 
 interface DonationsTableProps {
@@ -59,7 +52,7 @@ export function DonationsTable({ donations, givingTypes, isClient, isAdmin, onEd
           <TableRow>
             <TableHead>Donor</TableHead>
             <TableHead>Amount</TableHead>
-            <TableHead>Category</TableHead>
+            <TableHead>Network</TableHead>
             <TableHead>Giving Type</TableHead>
             <TableHead>Reference</TableHead>
             <TableHead>Service Time</TableHead>
@@ -79,8 +72,8 @@ export function DonationsTable({ donations, givingTypes, isClient, isAdmin, onEd
             <TableRow key={donation.id}>
               <TableCell data-label="Donor" className="font-medium">{donation.donorName}</TableCell>
               <TableCell data-label="Amount">₱{donation.amount.toFixed(2)}</TableCell>
-              <TableCell data-label="Category">
-                <Badge variant={categoryVariant[donation.category] || 'default'}>{donation.category}</Badge>
+              <TableCell data-label="Network">
+                <Badge variant="default">{donation.category}</Badge>
               </TableCell>
               <TableCell data-label="Giving Type">{givingTypes.find((gt) => gt.id === donation.givingTypeId)?.name || '-'}</TableCell>
               <TableCell data-label="Reference">{donation.reference || '-'}</TableCell>
