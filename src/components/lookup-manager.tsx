@@ -8,6 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useConfirm } from '@/components/confirm-dialog';
 
+const PAGE_SIZE = 10;
+
 interface LookupManagerProps {
   /** Lookup API base, e.g. "/api/networks". Must support GET/POST/PUT/DELETE. */
   apiUrl: string;
@@ -28,18 +30,34 @@ export function LookupManager({ apiUrl, field, itemNoun }: LookupManagerProps) {
   const [adding, setAdding] = React.useState(false);
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState('');
+  const [currentPage, setCurrentPage] = React.useState(1);
   const { toast } = useToast();
   const confirm = useConfirm();
+
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  // Deleting the last row on the final page would strand us past the end.
+  const page = Math.min(currentPage, totalPages);
+  const startIndex = (page - 1) * PAGE_SIZE;
+  const pageItems = items.slice(startIndex, startIndex + PAGE_SIZE);
+
+  React.useEffect(() => {
+    if (currentPage !== page) setCurrentPage(page);
+  }, [currentPage, page]);
 
   const load = React.useCallback(async () => {
     try {
       const res = await fetch(apiUrl);
-      if (res.ok) setItems(await res.json());
+      if (res.ok) {
+        const data = await res.json();
+        setItems(data);
+        return data as any[];
+      }
     } catch {
       // ignore — list stays as-is
     } finally {
       setLoading(false);
     }
+    return null;
   }, [apiUrl]);
 
   React.useEffect(() => {
@@ -63,7 +81,13 @@ export function LookupManager({ apiUrl, field, itemNoun }: LookupManagerProps) {
       });
       if (res.ok) {
         setNewValue('');
-        await load();
+        const data = await load();
+        // The list is sorted alphabetically, so a new entry can land on any
+        // page. Jump to wherever it went so the user sees what they just added.
+        if (data) {
+          const index = data.findIndex((item) => item[field] === value);
+          if (index >= 0) setCurrentPage(Math.floor(index / PAGE_SIZE) + 1);
+        }
       } else {
         await fail(res, 'Could not add');
       }
@@ -82,7 +106,12 @@ export function LookupManager({ apiUrl, field, itemNoun }: LookupManagerProps) {
     });
     if (res.ok) {
       setEditingId(null);
-      await load();
+      const data = await load();
+      // Renaming re-sorts the list, so follow the row to its new page.
+      if (data) {
+        const index = data.findIndex((item) => item.id === id);
+        if (index >= 0) setCurrentPage(Math.floor(index / PAGE_SIZE) + 1);
+      }
     } else {
       await fail(res, 'Could not update');
     }
@@ -133,7 +162,7 @@ export function LookupManager({ apiUrl, field, itemNoun }: LookupManagerProps) {
         ) : items.length === 0 ? (
           <p className="p-6 text-center text-sm text-muted-foreground">No {itemNoun}s yet. Add one above.</p>
         ) : (
-          items.map((item) => (
+          pageItems.map((item) => (
             <div key={item.id} className="flex items-center justify-between gap-2 px-3 py-2.5">
               {editingId === item.id ? (
                 <>
@@ -190,6 +219,35 @@ export function LookupManager({ apiUrl, field, itemNoun }: LookupManagerProps) {
           ))
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-center text-xs text-muted-foreground sm:text-left">
+            Showing {startIndex + 1}–{Math.min(startIndex + PAGE_SIZE, items.length)} of {items.length}
+          </p>
+          <div className="flex items-center justify-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+            <span className="mx-2 text-sm text-muted-foreground">
+              {page} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={page === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

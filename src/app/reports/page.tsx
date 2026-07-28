@@ -4,7 +4,6 @@ import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, XAxis, YAxis, Legend } from 'recharts';
 import { TrendingUp, Users, Landmark, Printer, ChevronDown, FileDown, Download, Database } from 'lucide-react';
@@ -19,6 +18,7 @@ import { AuthContext } from '@/context/auth-context';
 
 import { useReports } from './_hooks/use-reports';
 import { InteractivePieChart } from './_components/interactive-pie-chart';
+import { ReportTotalTable } from './_components/report-total-table';
 import { printReport, exportReportCSV, exportReportPDF, exportDatabase, type ReportExportData } from './_lib/report-export';
 
 const barChartConfig = {
@@ -286,28 +286,11 @@ export default function ReportsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Network</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {r.donationsByNetwork.map((item: { name: string; amount: number }) => (
-                    <TableRow key={item.name}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell className="text-right">₱{item.amount.toLocaleString()}</TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow className="border-t-2 bg-muted/20 font-semibold">
-                    <TableCell className="font-semibold">TOTAL</TableCell>
-                    <TableCell className="text-right font-semibold">
-                      ₱{r.donationsByNetwork.reduce((total: number, item: { amount: number }) => total + item.amount, 0).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <ReportTotalTable
+                labelHeader="Network"
+                rows={r.donationsByNetwork}
+                emptyMessage="No giving recorded for this period."
+              />
             </CardContent>
           </Card>
           <Card className={!r.printSelection.service ? 'print-hide' : ''}>
@@ -322,28 +305,11 @@ export default function ReportsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Service Time</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {r.donationsByServiceTime.map((item: { name: string; amount: number }) => (
-                    <TableRow key={item.name}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell className="text-right">₱{item.amount.toLocaleString()}</TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow className="border-t-2 bg-muted/20 font-semibold">
-                    <TableCell className="font-semibold">TOTAL</TableCell>
-                    <TableCell className="text-right font-semibold">
-                      ₱{r.donationsByServiceTime.reduce((total: number, item: { amount: number }) => total + item.amount, 0).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+              <ReportTotalTable
+                labelHeader="Service Time"
+                rows={r.donationsByServiceTime}
+                emptyMessage="No giving recorded for this period."
+              />
             </CardContent>
           </Card>
         </div>

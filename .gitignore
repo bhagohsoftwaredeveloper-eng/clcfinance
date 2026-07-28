@@ -69,3 +69,6 @@ logs/
 /public/workbox-*.js.map
 /public/worker-*.js
 /public/fallback-*.js
+
+# Playwright MCP browser-session artifacts (local debugging only)
+.playwright-mcp/
