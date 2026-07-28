@@ -283,6 +283,16 @@
     .page-break-before {
       page-break-before: always;
     }
+    /* Report tables scroll on screen; printing must show every row. */
+    .table-scroll {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    /* Sticky offsets are a screen-only affordance — they misplace rows in print. */
+    .table-scroll thead th,
+    .table-scroll tfoot td {
+      position: static !important;
+    }
     /* Hide any logos, titles, or headers */
     h1, h2, h3, h4, h5, h6 {
       display: none !important;
