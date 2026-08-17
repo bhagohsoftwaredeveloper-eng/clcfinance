@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AuthContext } from '@/context/auth-context';
 
 import { useReports } from './_hooks/use-reports';
@@ -117,43 +118,46 @@ export default function ReportsPage() {
                   </DropdownMenu>
                 </div>
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-4">
                 {/* Date range */}
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                  <label className="text-xs font-medium text-muted-foreground sm:hidden">Date Range</label>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Date Range</span>
                   <div className="flex items-center gap-2">
                     <Input type="date" value={r.startDate} onChange={(e) => r.setStartDate(e.target.value)} className="flex-1 sm:w-auto sm:flex-none" />
                     <span className="shrink-0 text-sm text-muted-foreground">to</span>
                     <Input type="date" value={r.endDate} onChange={(e) => r.setEndDate(e.target.value)} className="flex-1 sm:w-auto sm:flex-none" />
                   </div>
                 </div>
-                {/* Selects + print toggle */}
-                <div className="flex flex-wrap items-center gap-3">
-                  <Select onValueChange={(value) => r.setSelectedService(value || 'all')} defaultValue="all">
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                      <SelectValue placeholder="Filter by service" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Services</SelectItem>
-                      {r.serviceTimes.map((time: string) => (
-                        <SelectItem key={time} value={time}>{time}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select onValueChange={(value) => r.setSelectedNetwork(value || 'all')} defaultValue="all">
-                    <SelectTrigger className="w-full sm:w-[180px]">
-                      <SelectValue placeholder="Filter by network" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Networks</SelectItem>
-                      {r.networks.map((network) => (
-                        <SelectItem key={network} value={network}>{network}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="printAll" checked={r.isPrintAllChecked} onCheckedChange={(checked) => r.setAllPrintFlags(Boolean(checked))} />
-                    <Label htmlFor="printAll" className="text-sm">Select All for Printing</Label>
+                {/* Filters */}
+                <div className="flex flex-col gap-1.5 border-t pt-4">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Filters</span>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Select onValueChange={(value) => r.setSelectedService(value || 'all')} defaultValue="all">
+                      <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Filter by service" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Services</SelectItem>
+                        {r.serviceTimes.map((time: string) => (
+                          <SelectItem key={time} value={time}>{time}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select onValueChange={(value) => r.setSelectedNetwork(value || 'all')} defaultValue="all">
+                      <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Filter by network" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Networks</SelectItem>
+                        {r.networks.map((network) => (
+                          <SelectItem key={network} value={network}>{network}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="printAll" checked={r.isPrintAllChecked} onCheckedChange={(checked) => r.setAllPrintFlags(Boolean(checked))} />
+                      <Label htmlFor="printAll" className="text-sm">Select All for Printing</Label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -162,7 +166,7 @@ export default function ReportsPage() {
         </Card>
 
         {/* Summary cards */}
-        <div className="print-hide grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="print-hide grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardContent className="flex items-center gap-4 p-4 sm:p-6">
               <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-chart-2/10 text-chart-2">
@@ -196,123 +200,148 @@ export default function ReportsPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Income vs Expenses + Membership Growth */}
-        <div className={`mt-6 grid gap-6 md:grid-cols-1 lg:grid-cols-2 ${!r.printSelection.incomeVsExpenses && !r.printSelection.membershipGrowth ? 'print-hide' : ''}`}>
-          <Card className={!r.printSelection.incomeVsExpenses ? 'print-hide' : ''}>
-            <CardHeader>
-              <CardTitle>Income vs. Expenses</CardTitle>
-              <CardDescription>Comparison of total income and expenses.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={barChartConfig} className="h-[250px] w-full">
-                <BarChart data={r.incomeVsExpensesData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend />
-                  <Bar dataKey="income" fill="var(--color-income)" radius={8} />
-                  <Bar dataKey="expenses" fill="var(--color-expenses)" radius={8} />
-                </BarChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-          <Card className={!r.printSelection.membershipGrowth ? 'print-hide' : ''}>
-            <CardHeader>
-              <CardTitle>Membership Growth</CardTitle>
-              <CardDescription>New vs. Total Members Over Time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={membershipChartConfig} className="h-[250px] w-full">
-                <LineChart data={r.membershipGrowthData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line dataKey="new" type="monotone" stroke="var(--color-new)" strokeWidth={2} />
-                  <Line dataKey="total" type="monotone" stroke="var(--color-total)" strokeWidth={2} />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Pie charts */}
-        <div className={`mt-6 grid gap-6 md:grid-cols-1 lg:grid-cols-3 ${!r.printSelection.givingByNetworkPie && !r.printSelection.donationCategoriesPie && !r.printSelection.givingByServicePie ? 'print-hide' : ''}`}>
-          <Card className={!r.printSelection.givingByNetworkPie ? 'print-hide' : ''}>
-            <CardHeader>
-              <CardTitle>Giving by Network</CardTitle>
-              <CardDescription>Breakdown of giving by member network.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={r.networkChartConfig} className="h-[250px] w-full">
-                <PieChart>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Pie data={r.donationsByNetwork} dataKey="amount" nameKey="name" />
-                </PieChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-          <Card className={!r.printSelection.donationCategoriesPie ? 'print-hide' : ''}>
-            <CardHeader>
-              <CardTitle>Donation Categories</CardTitle>
-              <CardDescription>Breakdown of donations by fund</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={r.categoryChartConfig} className="h-[250px] w-full">
-                <PieChart>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Pie data={r.donationsByCategory} dataKey="amount" nameKey="category" />
-                </PieChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-          {r.printSelection.givingByServicePie && <InteractivePieChart donationsByServiceTime={r.donationsByServiceTime} />}
-        </div>
-
-        {/* Data tables */}
-        <div className={`mt-6 grid gap-6 md:grid-cols-1 lg:grid-cols-2 ${!r.printSelection.network && !r.printSelection.service ? 'print-hide' : ''}`}>
-          <Card className={!r.printSelection.network ? 'print-hide' : ''}>
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card>
+            <CardContent className="flex items-center gap-4 p-4 sm:p-6">
+              <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${r.totalDonations - r.totalExpenses >= 0 ? 'bg-green-600/10 text-green-600' : 'bg-red-600/10 text-red-600'}`}>
+                <Landmark className="h-6 w-6" />
+              </div>
               <div>
-                <CardTitle>Giving by Network</CardTitle>
-                <CardDescription>Data table of giving by member network.</CardDescription>
+                <p className="text-sm text-muted-foreground">Net Position</p>
+                <p className={`text-2xl font-bold ${r.totalDonations - r.totalExpenses >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  ₱{(r.totalDonations - r.totalExpenses).toLocaleString()}
+                </p>
               </div>
-              <div className="print-checkbox flex items-center space-x-2">
-                <Checkbox id="print-network" checked={r.printSelection.network} onCheckedChange={(checked) => r.setPrintFlag('network', Boolean(checked))} />
-                <Label htmlFor="print-network">Print</Label>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ReportTotalTable
-                labelHeader="Network"
-                rows={r.donationsByNetwork}
-                emptyMessage="No giving recorded for this period."
-              />
-            </CardContent>
-          </Card>
-          <Card className={!r.printSelection.service ? 'print-hide' : ''}>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Giving by Service</CardTitle>
-                <CardDescription>Data table of giving by service time.</CardDescription>
-              </div>
-              <div className="print-checkbox flex items-center space-x-2">
-                <Checkbox id="print-service" checked={r.printSelection.service} onCheckedChange={(checked) => r.setPrintFlag('service', Boolean(checked))} />
-                <Label htmlFor="print-service">Print</Label>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ReportTotalTable
-                labelHeader="Service Time"
-                rows={r.donationsByServiceTime}
-                emptyMessage="No giving recorded for this period."
-              />
             </CardContent>
           </Card>
         </div>
+
+        {/* Report sections */}
+        <Tabs defaultValue="overview" className="print-hide mt-6">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="giving">Giving</TabsTrigger>
+            <TabsTrigger value="tables">Tables</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Income vs. Expenses</CardTitle>
+                  <CardDescription>Comparison of total income and expenses.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={barChartConfig} className="h-[250px] w-full">
+                    <BarChart data={r.incomeVsExpensesData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Legend />
+                      <Bar dataKey="income" fill="var(--color-income)" radius={8} />
+                      <Bar dataKey="expenses" fill="var(--color-expenses)" radius={8} />
+                    </BarChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Membership Growth</CardTitle>
+                  <CardDescription>New vs. Total Members Over Time</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={membershipChartConfig} className="h-[250px] w-full">
+                    <LineChart data={r.membershipGrowthData}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Line dataKey="new" type="monotone" stroke="var(--color-new)" strokeWidth={2} />
+                      <Line dataKey="total" type="monotone" stroke="var(--color-total)" strokeWidth={2} />
+                    </LineChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="giving">
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Giving by Network</CardTitle>
+                  <CardDescription>Breakdown of giving by member network.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={r.networkChartConfig} className="h-[250px] w-full">
+                    <PieChart>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Pie data={r.donationsByNetwork} dataKey="amount" nameKey="name" />
+                    </PieChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Donation Categories</CardTitle>
+                  <CardDescription>Breakdown of donations by fund</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ChartContainer config={r.categoryChartConfig} className="h-[250px] w-full">
+                    <PieChart>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Pie data={r.donationsByCategory} dataKey="amount" nameKey="category" />
+                    </PieChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+              <InteractivePieChart donationsByServiceTime={r.donationsByServiceTime} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="tables">
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Giving by Network</CardTitle>
+                    <CardDescription>Data table of giving by member network.</CardDescription>
+                  </div>
+                  <div className="print-checkbox flex items-center space-x-2">
+                    <Checkbox id="print-network" checked={r.printSelection.network} onCheckedChange={(checked) => r.setPrintFlag('network', Boolean(checked))} />
+                    <Label htmlFor="print-network">Print</Label>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ReportTotalTable
+                    labelHeader="Network"
+                    rows={r.donationsByNetwork}
+                    emptyMessage="No giving recorded for this period."
+                  />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Giving by Service</CardTitle>
+                    <CardDescription>Data table of giving by service time.</CardDescription>
+                  </div>
+                  <div className="print-checkbox flex items-center space-x-2">
+                    <Checkbox id="print-service" checked={r.printSelection.service} onCheckedChange={(checked) => r.setPrintFlag('service', Boolean(checked))} />
+                    <Label htmlFor="print-service">Print</Label>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ReportTotalTable
+                    labelHeader="Service Time"
+                    rows={r.donationsByServiceTime}
+                    emptyMessage="No giving recorded for this period."
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
 
         {/* Print summary */}
         <div className="print-hide page-break-before mt-8">
