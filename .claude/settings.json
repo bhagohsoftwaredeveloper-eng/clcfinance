@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:9002)",
+      "Bash(npm run *)",
+      "Bash(echo \"started, pid $!\")",
+      "mcp__plugin_playwright_playwright__browser_fill_form",
+      "Bash(curl -s \"http://localhost:9002/api/donations\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); rows=[x for x in d if 'juan' in str\\(x.get\\('donorName',''\\)\\).lower\\(\\)]; print\\(json.dumps\\(rows[-3:], indent=2, ensure_ascii=False\\)\\)\")",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "Bash(curl -s -X DELETE \"http://localhost:9002/api/donations?id=d1783930631832\")",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "Bash(echo \"TYPECHECK_DONE exit=$?\")",
+      "Bash(curl -s \"http://localhost:9002/api/networks\")",
+      "Bash(node \"C:/Users/Admin/AppData/Local/Temp/claude/d--BHAGOH-PROJECT-CLC-finance/3766aaad-1d17-4158-a722-b1e5c969112d/scratchpad/fix-networks.mjs\")",
+      "Bash(node scripts/normalize-donation-networks.js --dry-run)",
+      "Bash(node -e ' *)",
+      "Bash(node scripts/normalize-donation-networks.js)",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(curl -s \"http://localhost:9002/api/reports?startDate=2026-01-01&endDate=2026-12-31&service=all&network=all\")"
+    ]
+  }
+}
