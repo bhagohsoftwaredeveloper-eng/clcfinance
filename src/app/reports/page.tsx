@@ -6,7 +6,7 @@ import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, XAxis, YAxis, Legend } from 'recharts';
-import { TrendingUp, Users, Landmark, Printer, ChevronDown, FileDown, Download, Database } from 'lucide-react';
+import { TrendingUp, Users, Landmark, Printer, ChevronDown, FileDown, Download, Database, LayoutGrid, PieChart as PieChartIcon, Table as TableIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,9 +65,9 @@ export default function ReportsPage() {
   return (
     <AppLayout>
       <div className="space-y-6" id="reports-content">
-        <Card className="print-hide surface-card">
+        <Card className="print-hide">
           <CardHeader>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <CardTitle className="text-xl">Reports &amp; Backup</CardTitle>
@@ -118,7 +118,7 @@ export default function ReportsPage() {
                   </DropdownMenu>
                 </div>
               </div>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 border-t pt-3">
                 {/* Date range */}
                 <div className="flex flex-col gap-1.5">
                   <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Date Range</span>
@@ -129,7 +129,7 @@ export default function ReportsPage() {
                   </div>
                 </div>
                 {/* Filters */}
-                <div className="flex flex-col gap-1.5 border-t pt-4">
+                <div className="flex flex-col gap-1.5 border-t pt-3">
                   <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Filters</span>
                   <div className="flex flex-wrap items-center gap-3">
                     <Select onValueChange={(value) => r.setSelectedService(value || 'all')} defaultValue="all">
@@ -167,7 +167,7 @@ export default function ReportsPage() {
 
         {/* Summary cards */}
         <div className="print-hide grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
+          <Card className="border-t-4 border-t-chart-2">
             <CardContent className="flex items-center gap-4 p-4 sm:p-6">
               <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-chart-2/10 text-chart-2">
                 <Users className="h-6 w-6" />
@@ -178,7 +178,7 @@ export default function ReportsPage() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-t-4 border-t-primary">
             <CardContent className="flex items-center gap-4 p-4 sm:p-6">
               <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Landmark className="h-6 w-6" />
@@ -189,7 +189,7 @@ export default function ReportsPage() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-t-4 border-t-chart-3">
             <CardContent className="flex items-center gap-4 p-4 sm:p-6">
               <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-chart-3/10 text-chart-3">
                 <TrendingUp className="h-6 w-6" />
@@ -200,7 +200,7 @@ export default function ReportsPage() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className={`border-t-4 ${r.totalDonations - r.totalExpenses >= 0 ? 'border-t-green-600' : 'border-t-red-600'}`}>
             <CardContent className="flex items-center gap-4 p-4 sm:p-6">
               <div className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${r.totalDonations - r.totalExpenses >= 0 ? 'bg-green-600/10 text-green-600' : 'bg-red-600/10 text-red-600'}`}>
                 <Landmark className="h-6 w-6" />
@@ -217,13 +217,22 @@ export default function ReportsPage() {
 
         {/* Report sections */}
         <Tabs defaultValue="overview" className="print-hide mt-6">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="giving">Giving</TabsTrigger>
-            <TabsTrigger value="tables">Tables</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 sm:w-auto sm:inline-grid">
+            <TabsTrigger value="overview" className="gap-1.5">
+              <LayoutGrid className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="giving" className="gap-1.5">
+              <PieChartIcon className="h-4 w-4" />
+              Giving
+            </TabsTrigger>
+            <TabsTrigger value="tables" className="gap-1.5">
+              <TableIcon className="h-4 w-4" />
+              Tables
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview">
+          <TabsContent value="overview" className="mt-4">
             <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
               <Card>
                 <CardHeader>
@@ -265,7 +274,7 @@ export default function ReportsPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="giving">
+          <TabsContent value="giving" className="mt-4">
             <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
               <Card>
                 <CardHeader>
@@ -299,7 +308,7 @@ export default function ReportsPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="tables">
+          <TabsContent value="tables" className="mt-4">
             <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
